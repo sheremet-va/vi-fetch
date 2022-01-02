@@ -206,12 +206,15 @@ export interface FetchSpyInstance {
   clear(): void;
 }
 
-interface FetchSpy {
+interface FetchSpyFn {
   (
     method: Method,
     path: string | RegExp,
     includeQuery?: boolean
   ): FetchSpyInstance;
+}
+
+interface FetchSpy extends FetchSpyFn {
   clearAll(): void;
   options: MockOptions;
   setOptions(o: Partial<MockOptions>): void;
@@ -360,11 +363,14 @@ mockApi.clearAll = spyOnFetch.clearAll;
 mockApi.options = spyOnFetch.options;
 mockApi.setOptions = spyOnFetch.setOptions;
 
-export const mockGet = spyOnFetch.bind(spyOnFetch, 'GET');
-export const mockPost = spyOnFetch.bind(spyOnFetch, 'POST');
-export const mockPatch = spyOnFetch.bind(spyOnFetch, 'PATCH');
-export const mockDelete = spyOnFetch.bind(spyOnFetch, 'DELETE');
-export const mockPut = spyOnFetch.bind(spyOnFetch, 'PUT');
+const createAlias = (method: Method) =>
+  spyOnFetch.bind(spyOnFetch, method) as any as FetchSpyFn;
+
+export const mockGet = createAlias('GET');
+export const mockPost = createAlias('POST');
+export const mockPatch = createAlias('PATCH');
+export const mockDelete = createAlias('DELETE');
+export const mockPut = createAlias('PUT');
 
 export function createMockApi({
   baseUrl = '',

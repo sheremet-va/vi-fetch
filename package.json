@@ -1,16 +1,26 @@
 {
-  "name": "fetch-mock",
-  "version": "1.0.0",
+  "name": "vi-fetch",
+  "version": "0.0.1",
   "description": "",
   "main": "dist/index.js",
+  "files": [
+    "dist/**"
+  ],
+  "exports": {
+    "main": "./dist/index.js",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts"
+  },
   "scripts": {
-    "test": "vitest --global"
+    "test": "vitest --global",
+    "build": "tsup"
   },
   "author": "sheremet-va",
   "license": "ISC",
   "devDependencies": {
     "prettier": "^2.5.1",
     "tsup": "^5.11.10",
+    "typescript": "^4.5.4",
     "vitest": "^0.0.127"
   },
   "dependencies": {

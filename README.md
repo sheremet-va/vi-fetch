@@ -1,4 +1,4 @@
-# fetch-mock
+# vi-fetch
 
 > An easy way to mock fetch
 
