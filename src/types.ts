@@ -8,7 +8,7 @@ interface FetchAssertions<R> {
 
 declare global {
   namespace Chai {
-    interface Assertions extends FetchAssertions<void> {}
+    interface Assertion extends FetchAssertions<void> {}
   }
 }
 
