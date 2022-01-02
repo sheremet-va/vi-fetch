@@ -4,15 +4,14 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "test": "vitest --global --environment happy-dom"
+    "test": "vitest --global"
   },
   "author": "sheremet-va",
   "license": "ISC",
   "devDependencies": {
-    "happy-dom": "^2.25.1",
     "prettier": "^2.5.1",
     "tsup": "^5.11.10",
-    "vitest": "^0.0.125"
+    "vitest": "^0.0.127"
   },
   "dependencies": {
     "tinyspy": "^0.2.6"
