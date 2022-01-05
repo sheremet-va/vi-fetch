@@ -132,13 +132,12 @@ export function prepareFetch(obj: any = globalThis, key: string = 'fetch') {
     if (result.type === 'throws') {
       throw result.value;
     }
-    const urlObj = new URL(url);
     const {
       body = {},
       statusCode = 200,
       statusText = 'ok',
     } = typeof result.value === 'function'
-      ? await result.value(urlObj, urlOrRequest, optionsOrNothing)
+      ? await result.value(new URL(url), urlOrRequest, optionsOrNothing)
       : result.value;
     return new ResponseMock(url, body, {
       status: statusCode,
