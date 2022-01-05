@@ -43,8 +43,5 @@
   "dependencies": {
     "query-string": "^7.0.1",
     "tinyspy": "^0.2.6"
-  },
-  "clean-publish": {
-    "cleanDocs": true
   }
 }
