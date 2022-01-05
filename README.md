@@ -37,6 +37,16 @@ import { prepareFetch } from 'vi-fetch';
 prepareFetch(globalThis, 'fetchNode');
 ```
 
+Add `vi-fetch/matchers` to your `types` config in `tsconfig.json`, if you are using TypeScript:
+
+```json
+{
+  "compilerOptions": {
+    "types": ["vi-fetch/matchers"]
+  }
+}
+```
+
 ### Mock Instance
 
 Calling `fetch` in browser can resolve in multiple situations:

@@ -17,11 +17,11 @@
     },
     "./*": "./*",
     "./matchers": {
-      "types": "./global.d.ts"
+      "types": "./matchers.d.ts"
     },
     "./setup": {
       "import": "./dist/setup.js",
-      "types": "./global.d.ts"
+      "types": "./matchers.d.ts"
     }
   },
   "scripts": {
