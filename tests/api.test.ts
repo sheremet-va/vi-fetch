@@ -186,3 +186,27 @@ describe('handlers', () => {
     await expect(callApi('/apples')).resolves.toBe(33);
   });
 });
+
+describe('support functions', () => {
+  const baseUrl = 'https://api.com/v1';
+
+  const { mockGet } = createMockApi({
+    baseUrl,
+  });
+
+  const callApi = (url: string, ...args: [Parameters<typeof fetch>[1]?]) => {
+    return fetch(baseUrl + url, ...args).then((r) => r.json());
+  };
+
+  test('withHeaders', async () => {
+    const mock = mockGet('/apples')
+      .withHeaders([['Content-Type', 'text/plain']])
+      .willResolve([{ count: 33 }]);
+
+    await callApi('/apples');
+
+    expect(mock.getRouteResults()[0].headers.get('Content-Type')).toBe(
+      'text/plain'
+    );
+  });
+});

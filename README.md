@@ -102,7 +102,7 @@ test('apples endpoint was called', async () => {
 To mock `fetch` with `ok: false`, you can use `willFail/willFailOnce` methods.
 
 - By default, `willFail` will resolve to `{}`, if no body is specified.
-- By default, `willFail` will return `status: 500` and `statucCode: Internal error`. You can override it with second and third arguments.
+- By default, `willFail` will return `status: 500` and `statucCode: Internal Server Error`. You can override it with second and third arguments.
 
 ```ts
 import { test, expect } from 'vitest';
@@ -195,6 +195,28 @@ test('apples endpoint was called', async () => {
   mock.clear();
 
   expect(mock).not.toHaveFetched();
+});
+```
+
+#### withHeaders
+
+This method lets you manipulate `Response` headers, if you depend on them. All responses of the mock will return these headers. If you don't specify your own headers, `mockApi` tries to guess it from the content you provided as a response.
+
+```ts
+import { test, expect } from 'vitest';
+import { mockGet } from 'vi-fetch';
+
+test('apples endpoint was called', async () => {
+  // or just "/apples" if you configure baseUrl
+  const mock = mockGet('https://api.com/v1/apples')
+    .withHeaders([['Content-Type', 'text/plain']])
+    .willResolve([{ count: 33 }]);
+
+  await renderApplesTable();
+
+  expect(mock.getRouteResults()[0].headers.get('Content-Type')).toBe(
+    'text/plain'
+  );
 });
 ```
 

@@ -1,4 +1,6 @@
-export class ResponseMock {
+import { HeadersMock } from './headers';
+
+export class ResponseMock implements Response {
   public body = null;
   public bodyUsed = false;
 
@@ -56,15 +58,15 @@ export class ResponseMock {
   }
 
   get headers() {
-    return this.init.headers as Headers; // TODO
+    return new HeadersMock(this.init.headers);
   }
 
   get ok() {
-    return this.status >= 200 && this.status < 400;
+    return this.status >= 200 && this.status < 300;
   }
 
   get redirected() {
-    return false;
+    return this.status >= 300 && this.status < 400;
   }
 
   get status() {
@@ -72,7 +74,7 @@ export class ResponseMock {
   }
 
   get statusText() {
-    return this.init.statusText || 'Ok';
+    return this.init.statusText || 'Internal Server Error';
   }
 
   get type() {

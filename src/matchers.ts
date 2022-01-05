@@ -1,4 +1,4 @@
-import { FetchSpyInstance } from './api';
+import { FetchSpyInstance } from './mock';
 import { parse as parseQuery } from 'query-string';
 
 interface JestUtils {
