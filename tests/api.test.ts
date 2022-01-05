@@ -30,6 +30,15 @@ describe('mocked api returns', () => {
     });
   });
 
+  test('mock blob', async () => {
+    mockApi('GET', '/path').willResolve(new Blob());
+
+    const result = await fetch(baseUrl + '/path').then((r) => r.blob());
+
+    expect(result).toEqual(new Blob());
+    expect(result).not.toEqual(new Blob(['h']));
+  });
+
   test('mock arrayBuffer', async () => {
     mockApi('GET', '/path').willResolve(new ArrayBuffer(1));
 

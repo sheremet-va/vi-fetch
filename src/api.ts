@@ -5,15 +5,17 @@ const methods = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'] as const;
 
 type Method = typeof methods[number];
 
+type AwaitedMockValue = (...args: FetchArgs) => Promise<MockValue> | MockValue;
+
 interface MockValue {
-  body: unknown;
-  statusCode: number;
-  statusText: string;
+  body?: unknown;
+  statusCode?: number;
+  statusText?: string;
 }
 
 interface MockSuccessResult {
-  type: 'rejects' | 'resolves';
-  value: MockValue;
+  type: 'rejects' | 'resolves' | 'do';
+  value: MockValue | AwaitedMockValue;
 }
 
 type MockResult =
@@ -34,43 +36,13 @@ interface CallsStorage {
 class MockStorage {
   private storage: CallsStorage[] = [];
 
-  willResolve(
+  public will(
     method: Method,
+    type: 'rejects' | 'resolves' | 'throws' | 'do',
     path: string | RegExp,
     includesQuery: boolean,
     once: boolean,
-    value: MockValue
-  ) {
-    return this.will(method, 'resolves', path, includesQuery, once, value);
-  }
-
-  willFail(
-    method: Method,
-    path: string | RegExp,
-    includesQuery: boolean,
-    once: boolean,
-    value: MockValue
-  ) {
-    return this.will(method, 'rejects', path, includesQuery, once, value);
-  }
-
-  willThrow(
-    method: Method,
-    path: string | RegExp,
-    includesQuery: boolean,
-    once: boolean,
-    value: Error
-  ) {
-    return this.will(method, 'throws', path, includesQuery, once, value);
-  }
-
-  private will(
-    method: Method,
-    type: 'rejects' | 'resolves' | 'throws',
-    path: string | RegExp,
-    includesQuery: boolean,
-    once: boolean,
-    value: MockValue | Error
+    value: MockValue | Error | AwaitedMockValue
   ) {
     this.storage.push({
       method,
@@ -85,12 +57,13 @@ class MockStorage {
     const storeIndex = this.storage.findIndex(
       ({ path, method, includesQuery }) => {
         if (fetchMethod !== method) return false;
-        if (!includesQuery && typeof path === 'string') {
-          [path] = path.split('?');
-        }
-        if (typeof path === 'string' && path === urlPath) {
+        const fetchPath =
+          !includesQuery && typeof path === 'string'
+            ? urlPath.split('?')[0]
+            : urlPath;
+        if (typeof path === 'string' && path === fetchPath) {
           return true;
-        } else if (path instanceof RegExp && path.test(urlPath)) {
+        } else if (path instanceof RegExp && path.test(fetchPath)) {
           return true;
         }
         return false;
@@ -149,14 +122,20 @@ export function prepareFetch(obj: any = globalThis, key: string = 'fetch') {
       typeof urlOrRequest !== 'string'
         ? urlOrRequest.method
         : options.method || 'GET';
-    const result = Mocks.getApiCall(method.toUpperCase() as Method, url);
+    let result = Mocks.getApiCall(method.toUpperCase() as Method, url);
     if (result === undefined) {
       return originalFetch(urlOrRequest, optionsOrNothing);
     }
     if (result.type === 'throws') {
       throw result.value;
     }
-    const { body, statusCode, statusText } = result.value;
+    const {
+      body = {},
+      statusCode = 200,
+      statusText = 'ok',
+    } = typeof result.value === 'function'
+      ? await result.value(urlOrRequest, optionsOrNothing)
+      : result.value;
     return new ResponseMock(url, body, {
       status: statusCode,
       statusText,
@@ -165,12 +144,13 @@ export function prepareFetch(obj: any = globalThis, key: string = 'fetch') {
   }) as typeof fetch;
 }
 
+type FetchArgs = [input: RequestInfo, init?: RequestInit | undefined];
+
 export interface FetchSpyInstance {
-  spy: SpyFn<
-    [input: RequestInfo, init?: RequestInit | undefined],
-    Promise<Response>
-  >;
-  getRouteCalls(): [input: RequestInfo, init?: RequestInit | undefined][];
+  spy: SpyFn<FetchArgs, Promise<Response>>;
+  baseUrl: string;
+  getRouteCalls(): FetchArgs[];
+  getRouteResults(): ResponseMock[];
   getRoute(): string | RegExp;
   getMethod(): Method;
   includesQuery(): boolean;
@@ -232,22 +212,36 @@ function spyOnFetch(
   );
   fetchPath = this.options.baseUrl + fetchPath;
 
+  function isRoute([input, options]: FetchArgs) {
+    const method = options?.method || 'GET';
+    if (method !== fetchMethod) return false;
+    let url = typeof input === 'string' ? input : input.url;
+    if (!includeQuery) {
+      [url] = url.split('?');
+    }
+    if (typeof fetchPath === 'string' && url === fetchPath) {
+      return true;
+    }
+    if (fetchPath instanceof RegExp) {
+      return fetchPath.test(url);
+    }
+    return false;
+  }
+
   function getRouteCalls() {
-    return spyFetch.calls.filter(([input, options]) => {
-      const method = options?.method || 'GET';
-      if (method !== fetchMethod) return false;
-      let url = typeof input === 'string' ? input : input.url;
-      if (!includeQuery) {
-        [url] = url.split('?');
+    return spyFetch.calls.filter(isRoute);
+  }
+
+  function getRouteResults() {
+    const returns: ResponseMock[] = [];
+
+    spyFetch.calls.forEach((call, index) => {
+      if (isRoute(call)) {
+        returns.push(spyFetch.returns[index] as any as ResponseMock);
       }
-      if (typeof fetchPath === 'string' && input === fetchPath) {
-        return true;
-      }
-      if (fetchPath instanceof RegExp) {
-        return fetchPath.test(url);
-      }
-      return false;
     });
+
+    return returns;
   }
 
   const getError = (err: Error | string) => {
@@ -260,11 +254,13 @@ function spyOnFetch(
   const mockInstance = {
     spy: spyFetch,
     getRouteCalls,
+    getRouteResults,
     getRoute: () => fetchPath,
     getMethod: () => fetchMethod,
     includesQuery: () => includeQuery,
+    baseUrl: this.options.baseUrl,
     willResolveOnce<T>(returns?: T, statusCode = 200) {
-      Mocks.willResolve(fetchMethod, fetchPath, includeQuery, true, {
+      Mocks.will(fetchMethod, 'resolves', fetchPath, includeQuery, true, {
         body: returns || {},
         statusCode,
         statusText: 'ok',
@@ -273,7 +269,7 @@ function spyOnFetch(
       return mockInstance;
     },
     willResolve<T>(returns?: T, statusCode = 200) {
-      Mocks.willResolve(fetchMethod, fetchPath, includeQuery, false, {
+      Mocks.will(fetchMethod, 'resolves', fetchPath, includeQuery, false, {
         body: returns || {},
         statusCode,
         statusText: 'ok',
@@ -282,7 +278,7 @@ function spyOnFetch(
       return mockInstance;
     },
     willFailOnce<T>(body?: T, statusCode = 500, statusText = 'Internal error') {
-      Mocks.willFail(fetchMethod, fetchPath, includeQuery, true, {
+      Mocks.will(fetchMethod, 'rejects', fetchPath, includeQuery, true, {
         body: body || {},
         statusCode,
         statusText,
@@ -291,7 +287,7 @@ function spyOnFetch(
       return mockInstance;
     },
     willFail<T>(body?: T, statusCode = 500, statusText = 'Internal error') {
-      Mocks.willFail(fetchMethod, fetchPath, includeQuery, false, {
+      Mocks.will(fetchMethod, 'rejects', fetchPath, includeQuery, false, {
         body: body || {},
         statusCode,
         statusText,
@@ -300,8 +296,9 @@ function spyOnFetch(
       return mockInstance;
     },
     willThrowOnce(error: Error | string) {
-      Mocks.willThrow(
+      Mocks.will(
         fetchMethod,
+        'throws',
         fetchPath,
         includeQuery,
         true,
@@ -311,8 +308,9 @@ function spyOnFetch(
       return mockInstance;
     },
     willThrow(error: Error | string) {
-      Mocks.willThrow(
+      Mocks.will(
         fetchMethod,
+        'throws',
         fetchPath,
         includeQuery,
         false,
@@ -320,6 +318,9 @@ function spyOnFetch(
       );
 
       return mockInstance;
+    },
+    willDo(fn: AwaitedMockValue) {
+      Mocks.will(fetchMethod, 'throws', fetchPath, includeQuery, false, fn);
     },
     clear() {
       Mocks.clear(fetchMethod, fetchPath);

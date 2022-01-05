@@ -4,7 +4,7 @@ export class ResponseMock {
 
   constructor(
     private path: string,
-    private value: unknown,
+    public value: unknown,
     private init: ResponseInit
   ) {}
 

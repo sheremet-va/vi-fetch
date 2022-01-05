@@ -1,25 +1,32 @@
 // @ts-nocheck
 
 import {
-  toCallApi,
-  toCallApiTimes,
-  toCallApiWithBody,
-  toCallApiWithHeaders,
-  toCallApiWithQuery,
+  toFetch,
+  toFetchTimes,
+  toFetchWithBody,
+  // toFetchWithHeaders,
+  toFetchWithQuery,
 } from './matchers';
 
-export function declareFetchAssertions(vi: { extend: any }) {
-  vi.extend({
-    toCallApi,
-    toCallApiTimes,
-    toCallApiWithBody,
-    toCallApiWithHeaders,
-    toCallApiWithQuery,
+export function declareFetchAssertions(expect: { extend: any }) {
+  expect.extend({
+    toHaveFetched: toFetch,
+    toFetch,
+
+    toHaveFetchedTimes: toFetchTimes,
+    toFetchTimes,
+
+    toHaveFetchedWithBody: toFetchWithBody,
+    toFetchWithBody,
+
+    // toHaveFetchedWithHeaders: toFetchWithHeaders,
+    // toFetchWithHeaders,
+
+    toHaveFetchedWithQuery: toFetchWithQuery,
+    toFetchWithQuery,
   });
 }
 
-if (typeof vi !== 'undefined') {
-  declareFetchAssertions(vi);
-} else if (typeof jest !== 'undefined') {
-  declareFetchAssertions(jest);
+if (typeof expect !== 'undefined') {
+  declareFetchAssertions(expect);
 }

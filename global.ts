@@ -1,9 +1,20 @@
 interface FetchAssertions<R> {
-  toCallApi(): R;
-  toCallApiTimes(times: number): R;
-  toCallApiWithHeaders(headers: Record<string, string | number | undefined>): R;
-  toCallApiWithBody(body: any): R;
-  toCallApiWithQuery(query: string | Record<string, any>): R;
+  toHaveFetched(): R;
+  toFetch(): R;
+
+  toHaveFetchedTimes(times: number): R;
+  toFetchTimes(times: number): R;
+
+  toHaveFetchedWithHeaders(
+    headers: Record<string, string | number | undefined>
+  ): R;
+  toFetchWithHeaders(headers: Record<string, string | number | undefined>): R;
+
+  toHaveFetchedWithBody(body: any): R;
+  toFetchWithBody(body: any): R;
+
+  toHaveFetchedWithQuery(query: string | Record<string, any>): R;
+  toFetchWithQuery(query: string | Record<string, any>): R;
 }
 
 declare global {
