@@ -8,7 +8,7 @@
   "type": "module",
   "files": [
     "dist/**",
-    "global.d.ts"
+    "matchers.d.ts"
   ],
   "exports": {
     ".": {
