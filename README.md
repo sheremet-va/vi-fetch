@@ -175,7 +175,7 @@ test('apples endpoint was called', async () => {
 
 #### clear
 
-You can clear on implementation details with `clear` method.
+You can clear all implementation details with `clear` method.
 
 ```ts
 import { test, expect } from 'vitest';
@@ -232,7 +232,7 @@ mockApi.setOptions({
 });
 ```
 
-You can also create isolated `mockApi` with its own options to not collide with globals:
+You can also create isolated `mockApi` with its own options to not collide with globals. It also returns aliased methods.
 
 ```ts
 import { createMockApi } from 'vi-fetch';
@@ -241,7 +241,7 @@ import { test, expect } from 'vitest';
 const { mockApi } = createMockApi({ baseUrl: 'https://api.com/v2' });
 
 test('isolated', async () => {
-  const mock = mockApi('GET', '/apples').willResolve(33);
+  const mock = mockApi('GET', '/apples').willResolve(33); // or mockGet
 
   await fetch('http://api.com/v2/apples');
 
@@ -359,12 +359,14 @@ test('api was called with json', async () => {
 });
 ```
 
+> Supports string, object, Blob, ArrayBuffer, and FormData. Will try to guess `Content-Type` header if not specified.
+
 #### toHaveFetchedWithQuery
 
 If you need to check if URL was called with the specific query string, you can use `toHaveFetchedWithQuery/toHaveFetchedNthTimeWithQuery`.
 
 ```ts
-test('api was called with json', async () => {
+test('api was called with query', async () => {
   const mock = mockApi('GET', '/apples').willResolve({
     count: 0,
     apples: [],
@@ -383,4 +385,4 @@ test('api was called with json', async () => {
 });
 ```
 
-> Support string, object or URLSearchParams
+> Supports string, object, and URLSearchParams
