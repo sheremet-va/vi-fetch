@@ -1,6 +1,7 @@
 lockfileVersion: 5.3
 
 specifiers:
+  '@types/node': ^17.0.8
   jsdom: ^19.0.0
   prettier: ^2.5.1
   query-string: ^7.0.1
@@ -14,6 +15,7 @@ dependencies:
   tinyspy: 0.2.6
 
 devDependencies:
+  '@types/node': 17.0.8
   jsdom: 19.0.0
   prettier: 2.5.1
   tsup: 5.11.10_typescript@4.5.4
@@ -56,6 +58,10 @@ packages:
 
   /@types/chai/4.3.0:
     resolution: {integrity: sha512-/ceqdqeRraGolFTcfoXNiqjyQhZzbINDngeoAq9GoHa8PPK1yNzTaxWjA6BFWp5Ua9JpXEMSS4s5i9tS0hOJtw==}
+    dev: true
+
+  /@types/node/17.0.8:
+    resolution: {integrity: sha512-YofkM6fGv4gDJq78g4j0mMuGMkZVxZDgtU0JRdx6FgiJDG+0fY0GKVolOV8WqVmEhLCXkQRjwDdKyPxJp/uucg==}
     dev: true
 
   /abab/2.0.5:

@@ -7,9 +7,20 @@
     "dist/**"
   ],
   "exports": {
-    "main": "./dist/index.js",
-    "module": "./dist/index.mjs",
-    "types": "./dist/index.d.ts"
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./*": "./*",
+    "./matchers": {
+      "types": "./global.d.ts"
+    },
+    "./setup": {
+      "import": "./dist/setup.mjs",
+      "require": "./dist/setup.js",
+      "types": "./dist/global.d.ts"
+    }
   },
   "scripts": {
     "test": "vitest --global --environment jsdom",
@@ -18,6 +29,7 @@
   "author": "sheremet-va",
   "license": "ISC",
   "devDependencies": {
+    "@types/node": "^17.0.8",
     "jsdom": "^19.0.0",
     "prettier": "^2.5.1",
     "tsup": "^5.11.10",
