@@ -4,8 +4,6 @@
 
 Compatible with [Jest](https://github.com/facebook/jest) and [Vitest](https://github.com/vitest-dev/vitest).
 
-> WIP: currently does not work
-
 ## Installing
 
 ```sh
