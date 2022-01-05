@@ -1,5 +1,5 @@
 export class HeadersMock implements Headers {
-  private headers = new Map();
+  private headers = new Map<string, string>();
 
   constructor(init?: HeadersInit | Record<string, string | number | boolean>) {
     if (!init) return;
@@ -44,5 +44,17 @@ export class HeadersMock implements Headers {
     this.headers.forEach((value, key) =>
       callbackfn.call(thisArg ?? this, value, key, this)
     );
+  }
+  entries() {
+    return this.headers.entries();
+  }
+  keys() {
+    return this.headers.keys();
+  }
+  values() {
+    return this.headers.values();
+  }
+  [Symbol.iterator]() {
+    return this.headers[Symbol.iterator]();
   }
 }
