@@ -137,7 +137,7 @@ import { renderApplesTable } from '../src/ApplesTable';
 test('apples endpoint was called', async () => {
   // or just "/apples" if you configure baseUrl
   const mock = mockGet('https://api.com/v1/apples').willDo((url) => {
-    if (url.includes('offset=')) {
+    if (url.searchParams.get('offset') > 2)) {
       return { body: [] };
     }
     return { body: [{ count: 3 }] };
