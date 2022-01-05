@@ -1,8 +1,10 @@
 {
   "name": "vi-fetch",
   "version": "0.0.2",
-  "description": "",
-  "main": "dist/index.js",
+  "description": "Easiest way to mock fetch",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist/**"
   ],
@@ -24,12 +26,14 @@
   },
   "scripts": {
     "test": "vitest --global --environment jsdom",
-    "build": "tsup"
+    "build": "tsup",
+    "publish": "tsup && clean-publish"
   },
   "author": "sheremet-va",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^17.0.8",
+    "clean-publish": "^3.4.5",
     "jsdom": "^19.0.0",
     "prettier": "^2.5.1",
     "tsup": "^5.11.10",
@@ -39,5 +43,9 @@
   "dependencies": {
     "query-string": "^7.0.1",
     "tinyspy": "^0.2.6"
+  },
+  "clean-publish": {
+    "cleanDocs": true,
+    "packageManager": "pnpm"
   }
 }
