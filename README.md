@@ -4,6 +4,8 @@
 
 Compatible with Jest and Vitest.
 
+> WIP: currently does not work
+
 ## Installing
 
 ```sh
