@@ -27,7 +27,7 @@
   "scripts": {
     "test": "vitest --global --environment jsdom",
     "build": "tsup",
-    "publish": "tsup && clean-publish --clean-docs"
+    "publish": "clean-publish --clean-docs"
   },
   "repository": {
     "type": "git",
