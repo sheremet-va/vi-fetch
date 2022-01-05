@@ -45,7 +45,6 @@
     "tinyspy": "^0.2.6"
   },
   "clean-publish": {
-    "cleanDocs": true,
-    "packageManager": "pnpm"
+    "cleanDocs": true
   }
 }
