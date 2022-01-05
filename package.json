@@ -21,7 +21,7 @@
     },
     "./setup": {
       "import": "./dist/setup.js",
-      "types": "./dist/global.d.ts"
+      "types": "./global.d.ts"
     }
   },
   "scripts": {
@@ -29,8 +29,16 @@
     "build": "tsup",
     "publish": "clean-publish --clean-docs"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sheremet-va/vi-fetch.git"
+  },
   "author": "sheremet-va",
-  "license": "ISC",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sheremet-va/vi-fetch/issues"
+  },
+  "homepage": "https://github.com/sheremet-va/vi-fetch#readme",
   "devDependencies": {
     "@types/node": "^17.0.8",
     "clean-publish": "^3.4.5",
