@@ -49,6 +49,16 @@ Add `vi-fetch/matchers` to your `types` config in `tsconfig.json`, if you are us
 }
 ```
 
+Also, it is recommended to clear up all mocks before each test to avoid collision between tests:
+
+```ts
+import { mockApi } from 'vi-fetch';
+
+beforeEach(() => {
+  mockApi.clearAll();
+});
+```
+
 ### Mock Instance
 
 Calling `fetch` in browser can resolve in multiple situations:
