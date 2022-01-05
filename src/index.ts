@@ -7,4 +7,5 @@ export {
   mockPatch,
   mockPost,
   mockPut,
+  createMockApi,
 } from './api';
