@@ -102,7 +102,7 @@ test('apples endpoint was called', async () => {
 To mock `fetch` with `ok: false`, you can use `willFail/willFailOnce` methods.
 
 - By default, `willFail` will resolve to `{}`, if no body is specified.
-- By default, `willFail` will return `status: 500` and `statucCode: Internal Server Error`. You can override it with second and third arguments.
+- By default, `willFail` will return `status: 500` and `statusText: Internal Server Error`. You can override it with second and third arguments. If you don't specify `status`, it will guess the `statusText` from `status`.
 
 ```ts
 import { test, expect } from 'vitest';
@@ -128,7 +128,7 @@ test('apples endpoint was called', async () => {
 
 If you have logic that depends on `fetch` throwing, you can test it with `willThrow/willThrowOnce` methods.
 
-`willThrow` requires `Error` object or a message. If `message` is specified, `fetch` will throw `TypeError`.
+`willThrow` requires `Error` object or a message. If `message` is specified, `fetch` will throw `TypeError` with this message.
 
 ```ts
 import { test, expect } from 'vitest';
@@ -149,7 +149,7 @@ test('apples endpoint was called', async () => {
 
 #### willDo
 
-If you want to do something when the `fetch` is invoking, you can use `willDo` method:
+If you want to make custom behaviour when the `fetch` is invoking, you can use `willDo` method. The first argument is `URL` instance, the rest are `fetch` arguments.
 
 ```ts
 import { test, expect } from 'vitest';
@@ -200,7 +200,7 @@ test('apples endpoint was called', async () => {
 
 #### withHeaders
 
-This method lets you manipulate `Response` headers, if you depend on them. All responses of the mock will return these headers. If you don't specify your own headers, `mockApi` tries to guess it from the content you provided as a response.
+This method lets you manipulate `Response` headers, if you depend on them. All responses of the mock will return these headers. If you don't specify `Content-Type` header, `mockApi` tries to guess it from the content you provided as a response.
 
 ```ts
 import { test, expect } from 'vitest';
@@ -213,8 +213,10 @@ test('apples endpoint was called', async () => {
     .willResolve([{ count: 33 }]);
 
   await renderApplesTable();
+  
+  const response = mock.getRouteResults()[0]
 
-  expect(mock.getRouteResults()[0].headers.get('Content-Type')).toBe(
+  expect(response.headers.get('Content-Type')).toBe(
     'text/plain'
   );
 });
@@ -249,7 +251,7 @@ test('isolated', async () => {
 });
 ```
 
-You can ignore `queryString` to make every `fetch` call that starts with url to go through this mock by passing `false` as the last argument, and then check it with `toHaveFetchedWithQuery`:
+You can ignore `queryString` to make every `fetch` call, that starts with url, to go through this mock by passing `false` as the last argument, and then check it with `toHaveFetchedWithQuery`:
 
 ```ts
 import { test, expect } from 'vitest';
@@ -364,6 +366,8 @@ test('api was called with json', async () => {
 #### toHaveFetchedWithQuery
 
 If you need to check if URL was called with the specific query string, you can use `toHaveFetchedWithQuery/toHaveFetchedNthTimeWithQuery`.
+
+Uses [query-string](https://github.com/sindresorhus/query-string) parse function with default options to parse query.
 
 ```ts
 test('api was called with query', async () => {
