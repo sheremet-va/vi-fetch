@@ -50,14 +50,14 @@ describe('mocked api returns', () => {
 });
 
 describe('aliases', () => {
-  const baseUrl = '';
+  const baseUrl = 'https://api.com/v1';
 
   const { mockDelete, mockGet, mockPatch, mockPost, mockPut } = createMockApi({
     baseUrl,
   });
 
-  const callApi = (...args: Parameters<typeof fetch>) => {
-    return fetch(...args).then((r) => r.json());
+  const callApi = (url: string, ...args: [Parameters<typeof fetch>[1]?]) => {
+    return fetch(baseUrl + url, ...args).then((r) => r.json());
   };
 
   test('mockGet', async () => {
@@ -99,14 +99,14 @@ describe('aliases', () => {
 });
 
 describe('handlers', () => {
-  const baseUrl = '';
+  const baseUrl = 'https://api.com/v1';
 
   const { mockApi } = createMockApi({
     baseUrl,
   });
 
-  const callApi = (...args: Parameters<typeof fetch>) => {
-    return fetch(...args).then((r) => r.json());
+  const callApi = (url: string, ...args: [Parameters<typeof fetch>[1]?]) => {
+    return fetch(baseUrl + url, ...args).then((r) => r.json());
   };
 
   test('resolving once', async () => {
@@ -166,5 +166,18 @@ describe('handlers', () => {
     await expect(callApi('/apples')).resolves.toBe(42);
     await expect(callApi('/apples')).resolves.toBe(10);
     await expect(callApi('/apples')).rejects.toThrowError('error');
+  });
+
+  test('willDo', async () => {
+    mockApi('GET', '/apples', false).willDo((url) => {
+      if (url.searchParams.get('count') === '2') {
+        return { body: [] };
+      }
+
+      return { body: [1] };
+    });
+
+    expect(callApi('/apples')).resolves.toEqual([1]);
+    expect(callApi('/apples?count=2')).resolves.toEqual([]);
   });
 });

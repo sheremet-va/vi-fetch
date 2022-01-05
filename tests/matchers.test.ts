@@ -108,6 +108,7 @@ describe('toFetchWithBody', () => {
     await callApi('/apples', { method: 'POST', body: '{ "string": "text" }' });
 
     expect(mock).toFetchWithBody({ string: 'text' });
+    expect(mock).toFetchWithBody('{ "string": "text" }');
     expect(mock).not.toFetchWithBody({ bar: 'foo' });
   });
 
@@ -127,6 +128,29 @@ describe('toFetchWithBody', () => {
 
     expect(mock).toFetchWithBody(new ArrayBuffer(2));
     expect(mock).not.toFetchWithBody(new ArrayBuffer(5));
+  });
+});
+
+describe('toFetchNthTimeWithBody', () => {
+  test('body with object', async () => {
+    const mock = mockApi('POST', '/apples').willResolve();
+
+    await callApi('/apples', {
+      method: 'POST',
+      body: '{ "string": "text 1" }',
+    });
+    await callApi('/apples', {
+      method: 'POST',
+      body: '{ "string": "text 2" }',
+    });
+    await callApi('/apples', {
+      method: 'POST',
+      body: '{ "string": "text 3" }',
+    });
+
+    expect(mock).toFetchNthTimeWithBody(1, { string: 'text 1' });
+    expect(mock).toFetchNthTimeWithBody(2, { string: 'text 2' });
+    expect(mock).toFetchNthTimeWithBody(3, { string: 'text 3' });
   });
 });
 
@@ -155,5 +179,19 @@ describe('toFetchWithQuery', () => {
     await callApi('/apples?count=5&offset=2');
 
     expect(mock).toFetchWithQuery({ count: '5', offset: '2' });
+  });
+});
+
+describe('toFetchNthTimeWithQuery', () => {
+  test('string query', async () => {
+    const mock = mockApi('GET', '/apples', false).willResolve();
+
+    await callApi('/apples?count=5&offset=1');
+    await callApi('/apples?count=5&offset=2');
+    await callApi('/apples?count=5&offset=3');
+
+    expect(mock).toFetchNthTimeWithQuery(1, 'count=5&offset=1');
+    expect(mock).toFetchNthTimeWithQuery(2, 'count=5&offset=2');
+    expect(mock).toFetchNthTimeWithQuery(3, 'count=5&offset=3');
   });
 });

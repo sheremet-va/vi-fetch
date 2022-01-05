@@ -143,6 +143,26 @@ export function toFetchTimes(
 //   headers: Record<string, string | number | undefined> | Headers
 // ) {}
 
+function bodyEquals(
+  expectedBody: any,
+  init: RequestInit | undefined,
+  equals: JestUtils['equals']
+) {
+  if (!init) return false;
+  const body = init.body;
+  if (!body) return false;
+  if (typeof body === 'string') {
+    if (typeof expectedBody === 'string') return body === expectedBody;
+    try {
+      return equals(JSON.parse(body), expectedBody);
+    } catch {
+      return false;
+    }
+  }
+  if (typeof expectedBody === 'string') return false;
+  return equals(body, expectedBody, [arrayBufferEquality, blobEquality], true);
+}
+
 export function toFetchWithBody(
   this: JestUtils,
   actual: FetchSpyInstance,
@@ -152,24 +172,7 @@ export function toFetchWithBody(
   const calls = actual.getRouteCalls();
   const route = actual.getRoute();
   const pass = calls.some(([, init]) => {
-    if (!init) return false;
-    const body = init.body;
-    if (!body) return false;
-    if (typeof body === 'string') {
-      if (typeof expectedBody === 'string') return body === expectedBody;
-      try {
-        return this.equals(JSON.parse(body), expectedBody);
-      } catch {
-        return false;
-      }
-    }
-    if (typeof expectedBody === 'string') return false;
-    return this.equals(
-      body,
-      expectedBody,
-      [arrayBufferEquality, blobEquality],
-      true
-    );
+    return bodyEquals(expectedBody, init, this.equals);
   });
   return {
     pass,
@@ -191,6 +194,60 @@ export function toFetchWithBody(
     },
   };
 }
+
+export function toFetchNthTimeWithBody(
+  this: JestUtils,
+  actual: FetchSpyInstance,
+  time: number,
+  expectedBody: any
+) {
+  assertSpy(actual);
+  const calls = actual.getRouteCalls();
+  const route = actual.getRoute();
+  const pass =
+    calls[time - 1] &&
+    bodyEquals(expectedBody, calls[time - 1][1], this.equals);
+  return {
+    pass,
+    message: () => {
+      return [
+        this.utils.matcherHint(
+          `${this.isNot ? '.not' : ''}.toFetchNthTimeWithBody`,
+          'api',
+          ''
+        ),
+        '',
+        'Expected:',
+        `  Route "${this.utils.EXPECTED_COLOR(String(route))}" to have${
+          this.isNot ? ' not' : ''
+        } been called ${time} time with body ${this.utils.printExpected(
+          expectedBody
+        )}.`,
+        'Received:',
+        printApiCalls(actual, this.utils.printReceived),
+      ].join('\n');
+    },
+  };
+}
+
+function createQueryComparison(
+  expectedQuery: any,
+  equals: JestUtils['equals']
+) {
+  const expectedQueryObj =
+    typeof expectedQuery === 'string'
+      ? parseQuery(expectedQuery)
+      : expectedQuery;
+  return ([input]: [string | Request, ...any]) => {
+    const url = typeof input === 'string' ? input : input.url;
+    const uri = new URL(url);
+    if (expectedQueryObj instanceof URLSearchParams) {
+      return expectedQueryObj.toString() === uri.searchParams.toString();
+    }
+    return equals(expectedQueryObj, parseQuery(uri.search));
+  };
+}
+
 export function toFetchWithQuery(
   this: JestUtils,
   actual: FetchSpyInstance,
@@ -199,19 +256,9 @@ export function toFetchWithQuery(
   assertSpy(actual);
   const calls = actual.getRouteCalls();
   const route = actual.getRoute();
-  const expectedQueryObj =
-    typeof expectedQuery === 'string'
-      ? parseQuery(expectedQuery)
-      : expectedQuery;
+  const queryEquals = createQueryComparison(expectedQuery, this.equals);
 
-  const pass = calls.some(([input]) => {
-    const url = typeof input === 'string' ? input : input.url;
-    const uri = new URL(url);
-    if (expectedQueryObj instanceof URLSearchParams) {
-      return expectedQueryObj.toString() === uri.searchParams.toString();
-    }
-    return this.equals(expectedQueryObj, parseQuery(uri.search));
-  });
+  const pass = calls.some(queryEquals);
   return {
     pass,
     message: () => {
@@ -226,6 +273,41 @@ export function toFetchWithQuery(
         `  Route "${this.utils.EXPECTED_COLOR(String(route))}" to have${
           this.isNot ? ' not' : ''
         } been called with query:`,
+        '',
+        this.utils.printExpected(expectedQuery),
+        'Received:',
+        printApiCalls(actual, this.utils.printReceived),
+      ].join('\n');
+    },
+  };
+}
+
+export function toFetchNthTimeWithQuery(
+  this: JestUtils,
+  actual: FetchSpyInstance,
+  time: number,
+  expectedQuery: string | Record<string, any> | URLSearchParams
+) {
+  assertSpy(actual);
+  const calls = actual.getRouteCalls();
+  const route = actual.getRoute();
+  const queryEquals = createQueryComparison(expectedQuery, this.equals);
+
+  const pass = calls[time - 1] && queryEquals(calls[time - 1]);
+  return {
+    pass,
+    message: () => {
+      return [
+        this.utils.matcherHint(
+          `${this.isNot ? '.not' : ''}.toFetchNthTimeWithQuery`,
+          'api',
+          ''
+        ),
+        '',
+        'Expected:',
+        `  Route "${this.utils.EXPECTED_COLOR(String(route))}" to have${
+          this.isNot ? ' not' : ''
+        } been called ${time} time with query:`,
         '',
         this.utils.printExpected(expectedQuery),
         'Received:',

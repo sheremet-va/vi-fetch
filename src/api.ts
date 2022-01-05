@@ -5,7 +5,10 @@ const methods = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'] as const;
 
 type Method = typeof methods[number];
 
-type AwaitedMockValue = (...args: FetchArgs) => Promise<MockValue> | MockValue;
+type AwaitedMockValue = (
+  url: URL,
+  ...args: FetchArgs
+) => Promise<MockValue> | MockValue;
 
 interface MockValue {
   body?: unknown;
@@ -129,12 +132,13 @@ export function prepareFetch(obj: any = globalThis, key: string = 'fetch') {
     if (result.type === 'throws') {
       throw result.value;
     }
+    const urlObj = new URL(url);
     const {
       body = {},
       statusCode = 200,
       statusText = 'ok',
     } = typeof result.value === 'function'
-      ? await result.value(urlOrRequest, optionsOrNothing)
+      ? await result.value(urlObj, urlOrRequest, optionsOrNothing)
       : result.value;
     return new ResponseMock(url, body, {
       status: statusCode,
@@ -183,6 +187,7 @@ export interface FetchSpyInstance {
    */
   willThrow(err: Error | string): FetchSpyInstance;
   willThrowOnce(err: Error | string): FetchSpyInstance;
+  willDo(fn: AwaitedMockValue): FetchSpyInstance;
   clear(): void;
 }
 
@@ -320,7 +325,9 @@ function spyOnFetch(
       return mockInstance;
     },
     willDo(fn: AwaitedMockValue) {
-      Mocks.will(fetchMethod, 'throws', fetchPath, includeQuery, false, fn);
+      Mocks.will(fetchMethod, 'do', fetchPath, includeQuery, false, fn);
+
+      return mockInstance;
     },
     clear() {
       Mocks.clear(fetchMethod, fetchPath);

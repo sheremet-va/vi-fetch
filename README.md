@@ -210,6 +210,7 @@ import { mockApi } from 'vi-fetch';
 
 mockApi.setOptions({ baseUrl: 'https://api.com/v1' });
 
+// usually you would call fetch inside your source code
 const callFetch = (url, options) => {
   return fetch('https://api.com/v1' + url, options);
 };
@@ -253,7 +254,7 @@ test('api was called 3 times', async () => {
 
 #### toHaveFetchedWithBody
 
-If you need to check if URL was called with the specific body, you can use `toHaveFetchedWithBody`.
+If you need to check if URL was called with the specific body, you can use `toHaveFetchedWithBody/toHaveFetchedNthTimeWithBody`.
 
 ```ts
 test('api was called with json', async () => {
@@ -269,12 +270,14 @@ test('api was called with json', async () => {
 
   expect(mock).toHaveFetchedWithBody({ foo: 'baz' });
   expect(mock).toHaveFetchedWithBody('{ "foo": "baz" }');
+
+  expect(mock).toHaveNthTimeFetchedWithBody(1, { foo: 'baz' });
 });
 ```
 
 #### toHaveFetchedWithQuery
 
-If you need to check if URL was called with the specific query string, you can use `toHaveFetchedWithQuery`.
+If you need to check if URL was called with the specific query string, you can use `toHaveFetchedWithQuery/toHaveFetchedNthTimeWithQuery`.
 
 ```ts
 test('api was called with json', async () => {
@@ -290,6 +293,9 @@ test('api was called with json', async () => {
     new URLSearchParams({ count: '5', offset: '2' })
   );
   expect(mock).toHaveFetchedWithQuery('count=5&offset=2');
+
+  expect(mock).toHaveFetchedNthTimeWithQuery(1, { count: 5, offset: 2 });
+  expect(mock).toHaveFetchedNthTimeWithQuery(1, 'count=5&offset=2');
 });
 ```
 

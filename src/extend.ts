@@ -1,14 +1,13 @@
-// @ts-nocheck
-
 import {
   toFetch,
   toFetchTimes,
   toFetchWithBody,
-  // toFetchWithHeaders,
   toFetchWithQuery,
+  toFetchNthTimeWithBody,
+  toFetchNthTimeWithQuery,
 } from './matchers';
 
-export function declareFetchAssertions(expect: { extend: any }) {
+export function declareFetchAssertions(expect: Chai.ExpectStatic) {
   expect.extend({
     toHaveFetched: toFetch,
     toFetch,
@@ -18,12 +17,13 @@ export function declareFetchAssertions(expect: { extend: any }) {
 
     toHaveFetchedWithBody: toFetchWithBody,
     toFetchWithBody,
-
-    // toHaveFetchedWithHeaders: toFetchWithHeaders,
-    // toFetchWithHeaders,
+    toHaveFetchedNthTimeWithBody: toFetchNthTimeWithBody,
+    toFetchNthTimeWithBody,
 
     toHaveFetchedWithQuery: toFetchWithQuery,
     toFetchWithQuery,
+    toHaveFetchedNthTimeWithQuery: toFetchNthTimeWithQuery,
+    toFetchNthTimeWithQuery,
   });
 }
 
