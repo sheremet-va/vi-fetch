@@ -2,7 +2,9 @@
 
 > Easiest way to mock fetch
 
-Compatible with [Jest](https://github.com/facebook/jest) when using ESM flag and [Vitest](https://github.com/vitest-dev/vitest).
+Compatible with [Vitest](https://github.com/vitest-dev/vitest) and [Jest](https://github.com/facebook/jest) when using [ESM flag](https://jestjs.io/docs/ecmascript-modules) or with transform for `/node_modules/vi-fetch`.
+
+The main difference with [fetch-mock](https://github.com/wheresrhys/fetch-mock) or [fetch-mock-jest](https://github.com/wheresrhys/fetch-mock-jest) is that it considers `fetch` just as a function call instead of calls to _endpoints_. `vi-fetch` provides matchers to test calls to _endpoints_ instead of simply function calls. For example, we consider an endpoint to be URL until the first `?`, query is like arguments to an endpoint, just like `body` - that's why we provide matchers like `toHaveFetchedWithQuery`.
 
 ## Installing
 
@@ -47,7 +49,7 @@ Usually we know the API endpoint and need to test only these three situations, a
 
 Use `mockApi` function to define `fetch` behavior. Aliases for popular methods are available: `mockGet`, `mockPost`, `mockPut`, `mockPatch`, `mockDelete`.
 
-> You can ignore query string when mocking, if you provide last argument as `false`. By default, query string is necessary.
+> You can ignore query string when mocking, if you provide last argument as `false`. By default, query string is necessary, if your fetch call has it.
 
 #### willResolve
 
@@ -153,6 +155,27 @@ test('apples endpoint was called', async () => {
 
 You can clear on implementation details with `clear` method.
 
+```ts
+import { test, expect } from 'vitest';
+import { mockGet } from 'vi-fetch';
+import { renderApplesTable } from '../src/ApplesTable';
+
+test('apples endpoint was called', async () => {
+  // or just "/apples" if you configure baseUrl
+  const mock = mockGet('https://api.com/v1/apples').willResolve([
+    { count: 33 },
+  ]);
+
+  await renderApplesTable();
+
+  expect(mock).toHaveFetched();
+
+  mock.clear();
+
+  expect(mock).not.toHaveFetched();
+});
+```
+
 ### Configuration
 
 To not repeat `baseUrl` every time you mock endpoint, you can configure it globally:
@@ -218,7 +241,7 @@ const callFetch = (url, options) => {
 
 #### toHaveFetched
 
-If you want to check if `fetch` was called with appropriate URL and method, you can use `toHaveFetched`.
+If you want to check if `fetch` was called with appropriate URL and method at least once, you can use `toHaveFetched`.
 
 ```ts
 test('api was called', async () => {
@@ -271,7 +294,7 @@ test('api was called with json', async () => {
   expect(mock).toHaveFetchedWithBody({ foo: 'baz' });
   expect(mock).toHaveFetchedWithBody('{ "foo": "baz" }');
 
-  expect(mock).toHaveNthTimeFetchedWithBody(1, { foo: 'baz' });
+  expect(mock).toHaveFetchedNthTimeWithBody(1, { foo: 'baz' });
 });
 ```
 
