@@ -3,15 +3,16 @@
   "version": "0.2.0",
   "description": "Easiest way to mock fetch",
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "type": "module",
   "files": [
-    "dist/**"
+    "dist/**",
+    "global.d.ts"
   ],
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
+      "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
     "./*": "./*",
@@ -19,15 +20,14 @@
       "types": "./global.d.ts"
     },
     "./setup": {
-      "import": "./dist/setup.mjs",
-      "require": "./dist/setup.js",
+      "import": "./dist/setup.js",
       "types": "./dist/global.d.ts"
     }
   },
   "scripts": {
     "test": "vitest --global --environment jsdom",
     "build": "tsup",
-    "publish": "tsup && clean-publish"
+    "publish": "clean-publish"
   },
   "author": "sheremet-va",
   "license": "ISC",

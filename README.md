@@ -2,7 +2,7 @@
 
 > Easiest way to mock fetch
 
-Compatible with [Jest](https://github.com/facebook/jest) and [Vitest](https://github.com/vitest-dev/vitest).
+Compatible with [Jest](https://github.com/facebook/jest) when using ESM flag and [Vitest](https://github.com/vitest-dev/vitest).
 
 ## Installing
 
