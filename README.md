@@ -249,7 +249,7 @@ test('isolated', async () => {
 });
 ```
 
-You can ignore `queryString`, if it doesn't matter for you and then check it with `toHaveFetchedWithQuery`, if it's needed:
+You can ignore `queryString` to make every `fetch` call go through this mock by passing `false` as the last argument, and then check it with `toHaveFetchedWithQuery`:
 
 ```ts
 import { test, expect } from 'vitest';
