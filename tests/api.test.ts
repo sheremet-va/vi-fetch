@@ -180,4 +180,9 @@ describe('handlers', () => {
     expect(callApi('/apples')).resolves.toEqual([1]);
     expect(callApi('/apples?count=2')).resolves.toEqual([]);
   });
+
+  test('regexp path', async () => {
+    mockApi('GET', /\/apples/).willResolveOnce(33);
+    await expect(callApi('/apples')).resolves.toBe(33);
+  });
 });

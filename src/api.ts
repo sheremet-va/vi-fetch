@@ -214,7 +214,9 @@ function spyOnFetch(
     settings.global,
     settings.fetchKey as 'fetch'
   );
-  fetchPath = this.options.baseUrl + fetchPath;
+  if (!(fetchPath instanceof RegExp)) {
+    fetchPath = this.options.baseUrl + fetchPath;
+  }
 
   function isRoute([input, options]: FetchArgs) {
     const method = options?.method || 'GET';
