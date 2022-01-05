@@ -249,7 +249,7 @@ test('isolated', async () => {
 });
 ```
 
-You can ignore `queryString` to make every `fetch` call go through this mock by passing `false` as the last argument, and then check it with `toHaveFetchedWithQuery`:
+You can ignore `queryString` to make every `fetch` call that starts with url to go through this mock by passing `false` as the last argument, and then check it with `toHaveFetchedWithQuery`:
 
 ```ts
 import { test, expect } from 'vitest';
@@ -264,6 +264,23 @@ test('apples endpoint was called', async () => {
 
   expect(mock).toHaveFetched();
   expect(mock).toHaveFetchedWithQuery({ count: 5, offset: 2 });
+});
+```
+
+You can also use regular expressions for urls:
+
+```ts
+import { test, expect } from 'vitest';
+import { mockGet } from 'vi-fetch';
+
+test('apples endpoint was called', async () => {
+  const mock = mockGet(/\/apples/).willResolve([
+    { count: 33 },
+  ]);
+
+  await fetch('https://api.com/v1/apples');
+
+  expect(mock).toHaveFetched();
 });
 ```
 
