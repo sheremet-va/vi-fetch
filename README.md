@@ -6,7 +6,7 @@ Compatible with [Vitest](https://github.com/vitest-dev/vitest) and [Jest](https:
 
 The main difference with [fetch-mock](https://github.com/wheresrhys/fetch-mock) or [fetch-mock-jest](https://github.com/wheresrhys/fetch-mock-jest) is that they consider `fetch` just as a function call instead of calls to _endpoints_. `vi-fetch` provides matchers to test calls to _endpoints_ instead of simply function calls.
 
-For example, we consider an endpoint to be URL until the first `?`, query is like arguments to an endpoint, just like `body` - that's why we provide matchers like `toHaveFetchedWithQuery`.
+For example, we consider an endpoint to be a part of URL until the first `?`: query is an argument to an endpoint, just like `body`, - that's why we provide matchers like `toHaveFetchedWithQuery` and `toHaveFetchedWithBody`.
 
 ## Installing
 
