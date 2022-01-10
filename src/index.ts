@@ -1,11 +1,11 @@
-export { declareFetchAssertions } from './extend';
+export { declareFetchAssertions } from './extend.js';
 export {
   prepareFetch,
-  mockApi,
+  mockFetch,
   mockDelete,
   mockGet,
   mockPatch,
   mockPost,
   mockPut,
-  createMockApi,
-} from './api';
+  createMockFetch as createMockApi,
+} from './api.js';

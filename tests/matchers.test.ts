@@ -1,13 +1,13 @@
-import '../src/extend';
-import { prepareFetch, mockApi } from '../src/api';
+import '../src/extend.js';
+import { prepareFetch, mockFetch } from '../src/api.js';
 
 beforeAll(() => {
   prepareFetch(globalThis, 'fetch');
-  mockApi.setOptions({ baseUrl: 'https://api.com' });
+  mockFetch.setOptions({ baseUrl: 'https://api.com' });
 });
 
 beforeEach(() => {
-  mockApi.clearAll();
+  mockFetch.clearAll();
 });
 
 const callApi = (url: string, ...args: [options?: RequestInit]) => {
@@ -16,7 +16,7 @@ const callApi = (url: string, ...args: [options?: RequestInit]) => {
 
 describe('toFetch', () => {
   test('api was called', async () => {
-    const mock = mockApi('GET', '/apples').willResolve();
+    const mock = mockFetch('GET', '/apples').willResolve();
 
     expect(mock).not.toFetch();
 
@@ -26,8 +26,8 @@ describe('toFetch', () => {
   });
 
   test('api wasnt called', async () => {
-    const mock = mockApi('GET', '/apples').willResolve();
-    mockApi('GET', '/apples33').willFail();
+    const mock = mockFetch('GET', '/apples').willResolve();
+    mockFetch('GET', '/apples33').willFail();
 
     await callApi('/apples33');
 
@@ -35,7 +35,7 @@ describe('toFetch', () => {
   });
 
   test('api was called with query', async () => {
-    const mock = mockApi('GET', '/apples?count=3').willResolve();
+    const mock = mockFetch('GET', '/apples?count=3').willResolve();
 
     expect(fetch('/apples')).rejects.toThrowError();
 
@@ -45,7 +45,7 @@ describe('toFetch', () => {
   });
 
   test('api was called with query but mock wihout', async () => {
-    const mock = mockApi('GET', '/apples').willResolve();
+    const mock = mockFetch('GET', '/apples').willResolve();
 
     expect(fetch('/apples?count=2')).rejects.toThrowError();
 
@@ -55,7 +55,7 @@ describe('toFetch', () => {
   });
 
   test('api was called without query', async () => {
-    const mock = mockApi('GET', '/apples', false).willResolve();
+    const mock = mockFetch('GET', '/apples', false).willResolve();
 
     await callApi('/apples?count=3');
 
@@ -65,7 +65,7 @@ describe('toFetch', () => {
 
 describe('toFetchTimes', () => {
   test('api called nth times', async () => {
-    const mock = mockApi('GET', '/apples').willResolve();
+    const mock = mockFetch('GET', '/apples').willResolve();
 
     expect(mock).toFetchTimes(0);
 
@@ -80,7 +80,7 @@ describe('toFetchTimes', () => {
   });
 
   test('api called nth times with no query', async () => {
-    const mock = mockApi('GET', '/apples', false).willResolve();
+    const mock = mockFetch('GET', '/apples', false).willResolve();
 
     expect(mock).toFetchTimes(0);
 
@@ -94,7 +94,7 @@ describe('toFetchTimes', () => {
 
 describe('toFetchWithBody', () => {
   test('body with string', async () => {
-    const mock = mockApi('POST', '/apples').willResolve();
+    const mock = mockFetch('POST', '/apples').willResolve();
 
     await callApi('/apples', { method: 'POST', body: 'text' });
 
@@ -103,7 +103,7 @@ describe('toFetchWithBody', () => {
   });
 
   test('body with object', async () => {
-    const mock = mockApi('POST', '/apples').willResolve();
+    const mock = mockFetch('POST', '/apples').willResolve();
 
     await callApi('/apples', { method: 'POST', body: '{ "string": "text" }' });
 
@@ -113,7 +113,7 @@ describe('toFetchWithBody', () => {
   });
 
   test('body with blob', async () => {
-    const mock = mockApi('POST', '/apples').willResolve();
+    const mock = mockFetch('POST', '/apples').willResolve();
 
     await callApi('/apples', { method: 'POST', body: new Blob(['1']) });
 
@@ -122,7 +122,7 @@ describe('toFetchWithBody', () => {
   });
 
   test('body with arrayBuffer', async () => {
-    const mock = mockApi('POST', '/apples').willResolve();
+    const mock = mockFetch('POST', '/apples').willResolve();
 
     await callApi('/apples', { method: 'POST', body: new ArrayBuffer(2) });
 
@@ -133,7 +133,7 @@ describe('toFetchWithBody', () => {
 
 describe('toFetchNthTimeWithBody', () => {
   test('body with object', async () => {
-    const mock = mockApi('POST', '/apples').willResolve();
+    const mock = mockFetch('POST', '/apples').willResolve();
 
     await callApi('/apples', {
       method: 'POST',
@@ -156,7 +156,7 @@ describe('toFetchNthTimeWithBody', () => {
 
 describe('toFetchWithQuery', () => {
   test('string query', async () => {
-    const mock = mockApi('GET', '/apples', false).willResolve();
+    const mock = mockFetch('GET', '/apples', false).willResolve();
 
     await callApi('/apples?count=5&offset=2');
 
@@ -164,7 +164,7 @@ describe('toFetchWithQuery', () => {
   });
 
   test('URLSearchParams query', async () => {
-    const mock = mockApi('GET', '/apples', false).willResolve();
+    const mock = mockFetch('GET', '/apples', false).willResolve();
 
     await callApi('/apples?count=5&offset=2');
 
@@ -174,7 +174,7 @@ describe('toFetchWithQuery', () => {
   });
 
   test('object query', async () => {
-    const mock = mockApi('GET', '/apples', false).willResolve();
+    const mock = mockFetch('GET', '/apples', false).willResolve();
 
     await callApi('/apples?count=5&offset=2');
 
@@ -184,7 +184,7 @@ describe('toFetchWithQuery', () => {
 
 describe('toFetchNthTimeWithQuery', () => {
   test('string query', async () => {
-    const mock = mockApi('GET', '/apples', false).willResolve();
+    const mock = mockFetch('GET', '/apples', false).willResolve();
 
     await callApi('/apples?count=5&offset=1');
     await callApi('/apples?count=5&offset=2');

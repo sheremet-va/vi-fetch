@@ -8,6 +8,7 @@ export default defineConfig({
   entry: fs.readdirSync(srcFolder).map((name) => 'src/' + name),
   outDir: 'dist',
   bundle: false,
+  platform: 'node',
   format: ['esm'],
   tsconfig: './tsconfig.json',
   target: 'node14',

@@ -52,10 +52,10 @@ Add `vi-fetch/matchers` to your `types` config in `tsconfig.json`, if you are us
 Also, it is recommended to clear up all mocks before each test to avoid collision between tests:
 
 ```ts
-import { mockApi } from 'vi-fetch';
+import { mockFetch } from 'vi-fetch';
 
 beforeEach(() => {
-  mockApi.clearAll();
+  mockFetch.clearAll();
 });
 ```
 
@@ -69,7 +69,7 @@ Calling `fetch` in browser can resolve in multiple situations:
 
 Usually we know the API endpoint and need to test only these three situations, and `vi-fetch` provides a wrapper around `fetch` to make it easy.
 
-Use `mockApi` function to define `fetch` behavior. Aliases for popular methods are available: `mockGet`, `mockPost`, `mockPut`, `mockPatch`, `mockDelete`.
+Use `mockFetch` function to define `fetch` behavior. Aliases for popular methods are available: `mockGet`, `mockPost`, `mockPut`, `mockPatch`, `mockDelete`.
 
 > You can ignore query string when mocking, if you provide last argument as `false`. By default, query string is necessary, if your fetch call has it.
 
@@ -200,7 +200,7 @@ test('apples endpoint was called', async () => {
 
 #### withHeaders
 
-This method lets you manipulate `Response` headers, if you depend on them. All responses of the mock will return these headers. If you don't specify `Content-Type` header, `mockApi` tries to guess it from the content you provided as a response.
+This method lets you manipulate `Response` headers, if you depend on them. All responses of the mock will return these headers. If you don't specify `Content-Type` header, `mockFetch` tries to guess it from the content you provided as a response.
 
 ```ts
 import { test, expect } from 'vitest';
@@ -213,12 +213,10 @@ test('apples endpoint was called', async () => {
     .willResolve([{ count: 33 }]);
 
   await renderApplesTable();
-  
-  const response = mock.getRouteResults()[0]
 
-  expect(response.headers.get('Content-Type')).toBe(
-    'text/plain'
-  );
+  const response = mock.getRouteResults()[0];
+
+  expect(response.headers.get('Content-Type')).toBe('text/plain');
 });
 ```
 
@@ -227,23 +225,23 @@ test('apples endpoint was called', async () => {
 To not repeat `baseUrl` every time you mock endpoint, you can configure it globally:
 
 ```ts
-import { mockApi } from 'vi-fetch';
+import { mockFetch } from 'vi-fetch';
 
-mockApi.setOptions({
+mockFetch.setOptions({
   baseUrl: 'https://api.com/v1',
 });
 ```
 
-You can also create isolated `mockApi` with its own options to not collide with globals. It also returns aliased methods.
+You can also create isolated `mockFetch` with its own options to not collide with globals. It also returns aliased methods.
 
 ```ts
-import { createMockApi } from 'vi-fetch';
+import { createmockFetch } from 'vi-fetch';
 import { test, expect } from 'vitest';
 
-const { mockApi } = createMockApi({ baseUrl: 'https://api.com/v2' });
+const { mockFetch } = createmockFetch({ baseUrl: 'https://api.com/v2' });
 
 test('isolated', async () => {
-  const mock = mockApi('GET', '/apples').willResolve(33); // or mockGet
+  const mock = mockFetch('GET', '/apples').willResolve(33); // or mockGet
 
   await fetch('http://api.com/v2/apples');
 
@@ -276,9 +274,7 @@ import { test, expect } from 'vitest';
 import { mockGet } from 'vi-fetch';
 
 test('apples endpoint was called', async () => {
-  const mock = mockGet(/\/apples/).willResolve([
-    { count: 33 },
-  ]);
+  const mock = mockGet(/\/apples/).willResolve([{ count: 33 }]);
 
   await fetch('https://api.com/v1/apples');
 
@@ -292,9 +288,9 @@ Imagine we have a test with this setup:
 
 ```ts
 import { expect, test } from 'vitest';
-import { mockApi } from 'vi-fetch';
+import { mockFetch } from 'vi-fetch';
 
-mockApi.setOptions({ baseUrl: 'https://api.com/v1' });
+mockFetch.setOptions({ baseUrl: 'https://api.com/v1' });
 
 // usually you would call fetch inside your source code
 const callFetch = (url, options) => {
@@ -308,7 +304,7 @@ If you want to check if `fetch` was called with appropriate URL and method at le
 
 ```ts
 test('api was called', async () => {
-  const mock = mockApi('GET', '/apples').willResolve({
+  const mock = mockFetch('GET', '/apples').willResolve({
     count: 0,
     apples: [],
   });
@@ -325,7 +321,7 @@ If you need to check if URL was called multiple times, you can use `toHaveFetche
 
 ```ts
 test('api was called 3 times', async () => {
-  const mock = mockApi('GET', '/apples', false).willResolve({
+  const mock = mockFetch('GET', '/apples', false).willResolve({
     count: 0,
     apples: [],
   });
@@ -344,7 +340,7 @@ If you need to check if URL was called with the specific body, you can use `toHa
 
 ```ts
 test('api was called with json', async () => {
-  const mock = mockApi('POST', '/apples').willResolve({
+  const mock = mockFetch('POST', '/apples').willResolve({
     count: 0,
     apples: [],
   });
@@ -371,7 +367,7 @@ Uses [query-string](https://github.com/sindresorhus/query-string) parse function
 
 ```ts
 test('api was called with query', async () => {
-  const mock = mockApi('GET', '/apples').willResolve({
+  const mock = mockFetch('GET', '/apples').willResolve({
     count: 0,
     apples: [],
   });

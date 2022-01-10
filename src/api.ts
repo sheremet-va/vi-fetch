@@ -1,7 +1,7 @@
 import { spyOn } from 'tinyspy';
-import { HeadersMock } from './headers';
-import { FetchMockInstance, FetchSpyInstance } from './mock';
-import { ResponseMock } from './response';
+import { HeadersMock } from './headers.js';
+import { FetchMockInstance, FetchSpyInstance } from './mock.js';
+import { ResponseMock } from './response.js';
 
 const methods = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'] as const;
 
@@ -244,11 +244,11 @@ spyOnFetch.setOptions = (options: Partial<MockOptions>) => {
   setGlobals(options);
 };
 
-export const mockApi = spyOnFetch.bind(spyOnFetch) as any as FetchSpy;
+export const mockFetch = spyOnFetch.bind(spyOnFetch) as any as FetchSpy;
 
-mockApi.clearAll = spyOnFetch.clearAll;
-mockApi.options = spyOnFetch.options;
-mockApi.setOptions = spyOnFetch.setOptions;
+mockFetch.clearAll = spyOnFetch.clearAll;
+mockFetch.options = spyOnFetch.options;
+mockFetch.setOptions = spyOnFetch.setOptions;
 
 const createAlias = (method: Method) =>
   spyOnFetch.bind(spyOnFetch, method) as any as FetchSpyFn;
@@ -259,30 +259,30 @@ export const mockPatch = createAlias('PATCH');
 export const mockDelete = createAlias('DELETE');
 export const mockPut = createAlias('PUT');
 
-export function createMockApi({
+export function createMockFetch({
   baseUrl = '',
   global = settings.global,
   fetchKey = settings.fetchKey,
 }: Partial<MockOptions> = {}) {
   const options = { baseUrl, global, fetchKey };
 
-  const mockApi = spyOnFetch.bind({ options }) as any as FetchSpy;
+  const mockFetch = spyOnFetch.bind({ options }) as any as FetchSpy;
 
-  mockApi.options = options;
-  mockApi.clearAll = spyOnFetch.clearAll;
-  mockApi.setOptions = (opts: Partial<MockOptions>) => {
+  mockFetch.options = options;
+  mockFetch.clearAll = spyOnFetch.clearAll;
+  mockFetch.setOptions = (opts: Partial<MockOptions>) => {
     if (typeof options.baseUrl === 'string') {
-      mockApi.options.baseUrl = options.baseUrl;
+      mockFetch.options.baseUrl = options.baseUrl;
     }
     setGlobals(opts);
   };
 
   return {
-    mockApi,
-    mockGet: mockApi.bind(mockApi, 'GET'),
-    mockPost: mockApi.bind(mockApi, 'POST'),
-    mockPatch: mockApi.bind(mockApi, 'PATCH'),
-    mockDelete: mockApi.bind(mockApi, 'DELETE'),
-    mockPut: mockApi.bind(mockApi, 'PUT'),
+    mockFetch,
+    mockGet: mockFetch.bind(mockFetch, 'GET'),
+    mockPost: mockFetch.bind(mockFetch, 'POST'),
+    mockPatch: mockFetch.bind(mockFetch, 'PATCH'),
+    mockDelete: mockFetch.bind(mockFetch, 'DELETE'),
+    mockPut: mockFetch.bind(mockFetch, 'PUT'),
   };
 }

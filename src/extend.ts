@@ -5,7 +5,7 @@ import {
   toFetchWithQuery,
   toFetchNthTimeWithBody,
   toFetchNthTimeWithQuery,
-} from './matchers';
+} from './matchers.js';
 
 export function declareFetchAssertions(expect: Chai.ExpectStatic) {
   expect.extend({

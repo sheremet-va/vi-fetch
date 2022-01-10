@@ -4,12 +4,12 @@ import type {
   HeadersMockInit,
   Method,
   MockValue,
-} from './api';
-import { Mocks } from './api';
-import { HeadersMock } from './headers';
-import { ResponseMock } from './response';
-import { getStatusText } from './statuses';
-import { guessContentType } from './utils';
+} from './api.js';
+import { Mocks } from './api.js';
+import { HeadersMock } from './headers.js';
+import { ResponseMock } from './response.js';
+import { getStatusText } from './statuses.js';
+import { guessContentType } from './utils.js';
 
 interface MockInstanceOptions {
   method: Method;

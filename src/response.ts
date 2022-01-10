@@ -1,4 +1,4 @@
-import { HeadersMock } from './headers';
+import { HeadersMock } from './headers.js';
 
 export class ResponseMock implements Response {
   public body = null;

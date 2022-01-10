@@ -1,4 +1,4 @@
-import { prepareFetch } from '../src/api';
+import { prepareFetch } from '../src/api.js';
 
 describe('prepare fetch mocks api', () => {
   const originalFetch = globalThis.fetch;

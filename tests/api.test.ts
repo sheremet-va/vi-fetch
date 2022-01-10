@@ -1,29 +1,29 @@
-import { prepareFetch, mockApi, createMockApi } from '../src/api';
+import { prepareFetch, mockFetch, createMockFetch } from '../src/api.js';
 
 beforeAll(() => {
   prepareFetch(globalThis, 'fetch');
 });
 
 beforeEach(() => {
-  mockApi.clearAll();
+  mockFetch.clearAll();
 });
 
 describe('mocked api returns', () => {
   const baseUrl = 'http://localhost/api';
-  const { mockApi } = createMockApi({ baseUrl });
+  const { mockFetch } = createMockFetch({ baseUrl });
 
   const callFetch = (cb: (r: Response) => any) => {
     return fetch(baseUrl + '/path').then(cb);
   };
 
   test('mock text', async () => {
-    mockApi('GET', '/path').willResolve('text');
+    mockFetch('GET', '/path').willResolve('text');
 
     await expect(callFetch((r) => r.text())).resolves.toBe('text');
   });
 
   test('mock json', async () => {
-    mockApi('GET', '/path').willResolve({ hello: 'world' });
+    mockFetch('GET', '/path').willResolve({ hello: 'world' });
 
     await expect(callFetch((r) => r.json())).resolves.toEqual({
       hello: 'world',
@@ -31,7 +31,7 @@ describe('mocked api returns', () => {
   });
 
   test('mock blob', async () => {
-    mockApi('GET', '/path').willResolve(new Blob());
+    mockFetch('GET', '/path').willResolve(new Blob());
 
     const result = await fetch(baseUrl + '/path').then((r) => r.blob());
 
@@ -40,7 +40,7 @@ describe('mocked api returns', () => {
   });
 
   test('mock arrayBuffer', async () => {
-    mockApi('GET', '/path').willResolve(new ArrayBuffer(1));
+    mockFetch('GET', '/path').willResolve(new ArrayBuffer(1));
 
     const result = await fetch(baseUrl + '/path').then((r) => r.arrayBuffer());
 
@@ -52,9 +52,11 @@ describe('mocked api returns', () => {
 describe('aliases', () => {
   const baseUrl = 'https://api.com/v1';
 
-  const { mockDelete, mockGet, mockPatch, mockPost, mockPut } = createMockApi({
-    baseUrl,
-  });
+  const { mockDelete, mockGet, mockPatch, mockPost, mockPut } = createMockFetch(
+    {
+      baseUrl,
+    }
+  );
 
   const callApi = (url: string, ...args: [Parameters<typeof fetch>[1]?]) => {
     return fetch(baseUrl + url, ...args).then((r) => r.json());
@@ -101,7 +103,7 @@ describe('aliases', () => {
 describe('handlers', () => {
   const baseUrl = 'https://api.com/v1';
 
-  const { mockApi } = createMockApi({
+  const { mockFetch } = createMockFetch({
     baseUrl,
   });
 
@@ -110,7 +112,7 @@ describe('handlers', () => {
   };
 
   test('resolving once', async () => {
-    mockApi('GET', '/apples').willResolveOnce(33);
+    mockFetch('GET', '/apples').willResolveOnce(33);
     await expect(callApi('/apples')).resolves.toBe(33);
     // calls real fetch
     await expect(callApi('/apples')).rejects.toThrowError(
@@ -119,14 +121,14 @@ describe('handlers', () => {
   });
 
   test('resolving everytime', async () => {
-    mockApi('GET', '/apples').willResolve(33);
+    mockFetch('GET', '/apples').willResolve(33);
     await expect(callApi('/apples')).resolves.toBe(33);
     await expect(callApi('/apples')).resolves.toBe(33);
     await expect(callApi('/apples')).resolves.toBe(33);
   });
 
   test('failing once', async () => {
-    mockApi('GET', '/apples').willFailOnce(33);
+    mockFetch('GET', '/apples').willFailOnce(33);
     await expect(callApi('/apples')).resolves.toBe(33);
     // calls real fetch
     await expect(callApi('/apples')).rejects.toThrowError(
@@ -135,14 +137,14 @@ describe('handlers', () => {
   });
 
   test('failing everytime', async () => {
-    mockApi('GET', '/apples').willFail(33);
+    mockFetch('GET', '/apples').willFail(33);
     await expect(callApi('/apples')).resolves.toBe(33);
     await expect(callApi('/apples')).resolves.toBe(33);
     await expect(callApi('/apples')).resolves.toBe(33);
   });
 
   test('throwing once', async () => {
-    mockApi('GET', '/apples').willThrowOnce('error');
+    mockFetch('GET', '/apples').willThrowOnce('error');
     await expect(callApi('/apples')).rejects.toThrowError('error');
     // calls real fetch
     await expect(callApi('/apples')).rejects.toThrowError(
@@ -151,14 +153,14 @@ describe('handlers', () => {
   });
 
   test('throwing everytime', async () => {
-    mockApi('GET', '/apples').willThrow('error');
+    mockFetch('GET', '/apples').willThrow('error');
     await expect(callApi('/apples')).rejects.toThrowError('error');
     await expect(callApi('/apples')).rejects.toThrowError('error');
     await expect(callApi('/apples')).rejects.toThrowError('error');
   });
 
   test('chaining', async () => {
-    mockApi('GET', '/apples')
+    mockFetch('GET', '/apples')
       .willResolveOnce(42)
       .willFailOnce(10)
       .willThrowOnce('error');
@@ -169,7 +171,7 @@ describe('handlers', () => {
   });
 
   test('willDo', async () => {
-    mockApi('GET', '/apples', false).willDo((url) => {
+    mockFetch('GET', '/apples', false).willDo((url) => {
       if (url.searchParams.get('count') === '2') {
         return { body: [] };
       }
@@ -182,7 +184,7 @@ describe('handlers', () => {
   });
 
   test('regexp path', async () => {
-    mockApi('GET', /\/apples/).willResolveOnce(33);
+    mockFetch('GET', /\/apples/).willResolveOnce(33);
     await expect(callApi('/apples')).resolves.toBe(33);
   });
 });
@@ -190,7 +192,7 @@ describe('handlers', () => {
 describe('support functions', () => {
   const baseUrl = 'https://api.com/v1';
 
-  const { mockGet } = createMockApi({
+  const { mockGet } = createMockFetch({
     baseUrl,
   });
 

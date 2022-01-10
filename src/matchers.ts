@@ -1,5 +1,5 @@
-import type { FetchSpyInstance } from './mock';
 import { parse as parseQuery } from 'query-string';
+import type { FetchSpyInstance } from './mock.js';
 
 interface JestUtils {
   isNot: boolean;

@@ -1,4 +1,4 @@
-import { HeadersMock } from '../src/headers';
+import { HeadersMock } from '../src/headers.js';
 
 describe('HeadersMock has the same behaviour as original', () => {
   test('names are normalized', () => {

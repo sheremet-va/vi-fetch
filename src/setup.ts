@@ -1,5 +1,5 @@
-import './extend';
-import { prepareFetch } from './api';
+import './extend.js';
+import { prepareFetch } from './api.js';
 
 // if happy dom
 if (
