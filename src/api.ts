@@ -188,6 +188,10 @@ interface FetchSpyFn {
   ): FetchSpyInstance;
 }
 
+interface FetchSpyFnShort {
+  (path: string | RegExp, includeQuery?: boolean): FetchSpyInstance;
+}
+
 interface FetchSpy extends FetchSpyFn {
   clearAll(): void;
   options: MockOptions;
@@ -251,7 +255,7 @@ mockFetch.options = spyOnFetch.options;
 mockFetch.setOptions = spyOnFetch.setOptions;
 
 const createAlias = (method: Method) =>
-  spyOnFetch.bind(spyOnFetch, method) as any as FetchSpyFn;
+  spyOnFetch.bind(spyOnFetch, method) as any as FetchSpyFnShort;
 
 export const mockGet = createAlias('GET');
 export const mockPost = createAlias('POST');
@@ -277,12 +281,16 @@ export function createMockFetch({
     setGlobals(opts);
   };
 
+  const createAlias = (method: Method) => {
+    return mockFetch.bind(mockFetch, method) as FetchSpyFnShort;
+  };
+
   return {
     mockFetch,
-    mockGet: mockFetch.bind(mockFetch, 'GET'),
-    mockPost: mockFetch.bind(mockFetch, 'POST'),
-    mockPatch: mockFetch.bind(mockFetch, 'PATCH'),
-    mockDelete: mockFetch.bind(mockFetch, 'DELETE'),
-    mockPut: mockFetch.bind(mockFetch, 'PUT'),
+    mockGet: createAlias('GET'),
+    mockPost: createAlias('POST'),
+    mockPatch: createAlias('PATCH'),
+    mockDelete: createAlias('DELETE'),
+    mockPut: createAlias('PUT'),
   };
 }
