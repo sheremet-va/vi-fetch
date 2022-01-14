@@ -1,3 +1,5 @@
+import { Appeandable } from './appeanable.js';
+
 function normalizeName(name: string) {
   if (typeof name !== 'string') {
     name = String(name);
@@ -10,15 +12,15 @@ function normalizeName(name: string) {
   return name.toLowerCase();
 }
 
-export class HeadersMock implements Headers {
-  private headers = new Map<string, string>();
-
+export class HeadersMock extends Appeandable implements Headers {
   constructor(init?: HeadersInit | Record<string, string | number | boolean>) {
+    super();
+
     if (!init) return;
 
     if (Array.isArray(init)) {
       init.forEach(([key, name]) =>
-        this.headers.set(normalizeName(key), String(name))
+        this.append(normalizeName(key), String(name))
       );
       return;
     }
@@ -28,13 +30,13 @@ export class HeadersMock implements Headers {
       (typeof Headers !== 'undefined' && init instanceof Headers)
     ) {
       init.forEach((value, key) =>
-        this.headers.set(normalizeName(key), String(value))
+        this.append(normalizeName(key), String(value))
       );
       return;
     }
 
     for (const key in init) {
-      this.headers.set(
+      this.append(
         normalizeName(key),
         String((init as Record<string, string>)[key])
       );
@@ -42,38 +44,18 @@ export class HeadersMock implements Headers {
   }
 
   append(name: string, value: string) {
-    this.headers.set(normalizeName(name), String(value));
+    super.append(normalizeName(name), String(value));
   }
   delete(name: string) {
-    this.headers.delete(normalizeName(name));
+    super.delete(normalizeName(name));
   }
   get(name: string) {
-    return this.headers.get(normalizeName(name)) ?? null;
+    return super.get(normalizeName(name)) ?? null;
   }
   has(name: string) {
-    return this.headers.has(normalizeName(name));
+    return super.has(normalizeName(name));
   }
   set(name: string, value: string) {
-    this.headers.set(normalizeName(name), String(value));
-  }
-  forEach(
-    callbackfn: (value: string, key: string, parent: Headers) => void,
-    thisArg?: any
-  ) {
-    this.headers.forEach((value, key) =>
-      callbackfn.call(thisArg ?? this, value, key, this)
-    );
-  }
-  entries() {
-    return this.headers.entries();
-  }
-  keys() {
-    return this.headers.keys();
-  }
-  values() {
-    return this.headers.values();
-  }
-  [Symbol.iterator]() {
-    return this.headers[Symbol.iterator]();
+    super.set(normalizeName(name), String(value));
   }
 }
