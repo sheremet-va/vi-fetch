@@ -51,7 +51,7 @@ const isSpyInstance = (actual: unknown): actual is FetchSpyInstance => {
     typeof actual === 'object' &&
     actual &&
     'spy' in actual &&
-    (actual as any).spy.__isSpy
+    (actual as any).spy._isMockFunction
   ) {
     return true;
   }
