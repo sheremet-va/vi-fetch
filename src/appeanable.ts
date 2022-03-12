@@ -5,11 +5,7 @@ export class Appeandable {
     this._s.push([name, value]);
   }
   delete(name: any) {
-    this._s.forEach(([key], index) => {
-      if (key === name) {
-        this._s.splice(index, 1);
-      }
-    });
+    this._s = this._s.filter(([key]) => key !== name);
   }
   get(name: any) {
     for (const [key, value] of this._s) {
@@ -27,7 +23,7 @@ export class Appeandable {
     return false;
   }
   set(name: any, value: any) {
-    this._s = this._s.filter(([key]) => key !== name);
+    this.delete(name);
     this._s.push([name, value]);
   }
   forEach(
