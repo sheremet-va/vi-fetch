@@ -7,7 +7,7 @@ import {
   toFetchNthTimeWithQuery,
 } from './matchers.js';
 
-export function declareFetchAssertions(expect: Chai.ExpectStatic) {
+export function declareFetchAssertions(expect: { extend: (obj: any) => any }) {
   expect.extend({
     toHaveFetched: toFetch,
     toFetch,
