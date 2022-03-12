@@ -4,7 +4,7 @@
 
 Compatible with [Vitest](https://github.com/vitest-dev/vitest) and [Jest](https://github.com/facebook/jest) when using [ESM flag](https://jestjs.io/docs/ecmascript-modules) or with transform for `/node_modules/vi-fetch`.
 
-The main difference with [fetch-mock](https://github.com/wheresrhys/fetch-mock) or [fetch-mock-jest](https://github.com/wheresrhys/fetch-mock-jest) is that they consider `fetch` just as a function call instead of calls to _endpoints_. `vi-fetch` provides matchers to test calls to _endpoints_ instead of simply function calls.
+The main difference with [fetch-mock](https://github.com/wheresrhys/fetch-mock) or [fetch-mock-jest](https://github.com/wheresrhys/fetch-mock-jest) is that they consider `fetch` just as a function call instead of function that calls API _endpoints_. `vi-fetch` provides matchers to test calls to _endpoints_ instead of simply function calls.
 
 For example, we consider an endpoint to be a part of URL until the first `?`: query is an argument to an endpoint, just like `body`, - that's why we provide matchers like `toHaveFetchedWithQuery` and `toHaveFetchedWithBody`.
 
@@ -235,10 +235,10 @@ mockFetch.setOptions({
 You can also create isolated `mockFetch` with its own options to not collide with globals. It also returns aliased methods.
 
 ```ts
-import { createmockFetch } from 'vi-fetch';
+import { createMockFetch } from 'vi-fetch';
 import { test, expect } from 'vitest';
 
-const { mockFetch } = createmockFetch({ baseUrl: 'https://api.com/v2' });
+const { mockFetch } = createMockFetch({ baseUrl: 'https://api.com/v2' });
 
 test('isolated', async () => {
   const mock = mockFetch('GET', '/apples').willResolve(33); // or mockGet
