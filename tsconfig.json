@@ -13,6 +13,6 @@
     "outDir": "./dist",
     "declaration": true,
     "inlineSourceMap": true,
-    "types": ["vitest/global", "node"]
+    "types": ["vitest/globals", "node"]
   }
 }
