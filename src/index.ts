@@ -9,3 +9,4 @@ export {
   mockPut,
   createMockFetch as createMockApi,
 } from './api.js';
+export type { FetchSpyInstance } from './mock';
