@@ -16,13 +16,29 @@ const callApi = (url: string, ...args: [options?: RequestInit]) => {
 
 describe('toFetch', () => {
   test('api was called', async () => {
-    const mock = mockFetch('GET', '/apples').willResolve();
+    const mock = mockFetch('GET', '/apples').willResolve([]);
 
     expect(mock).not.toFetch();
 
     await callApi('/apples');
 
     expect(mock).toFetch();
+    expect(mock).toFetch([]);
+
+    expect(mock).not.toFetch(['hello world']);
+  });
+
+  test('api was called nth time with specific response', async () => {
+    const mock = mockFetch('GET', '/apples').willResolve([]);
+
+    await callApi('/apples');
+
+    mock.willResolve(['1kg']);
+
+    await callApi('/apples');
+
+    expect(mock).toFetchNthTime(1, []);
+    expect(mock).toFetchNthTime(2, ['1kg']);
   });
 
   test('api wasnt called', async () => {

@@ -300,7 +300,7 @@ const callFetch = (url, options) => {
 
 #### toHaveFetched
 
-If you want to check if `fetch` was called with appropriate URL and method at least once, you can use `toHaveFetched`.
+If you want to check if `fetch` was called with appropriate URL and method at least once, you can use `toHaveFetched`. If you want to be more sure about returned response, you can pass it as optional argument. It will pass if any call returned this response.
 
 ```ts
 test('api was called', async () => {
@@ -312,6 +312,36 @@ test('api was called', async () => {
   await callFetch('/apples');
 
   expect(mock).toHaveFetched();
+  expect(mock).toHaveFetched({
+    count: 0,
+    apples: [],
+  });
+});
+```
+
+#### toHaveFetchedNthTime
+
+If you want to check the returned value of nth call, you can use `toHaveFetchedNthTime` (index starts at 1).
+
+```ts
+test('api was called', async () => {
+  const mock = mockFetch('GET', '/apples').willResolve({
+    count: 0,
+    apples: [],
+  });
+
+  await callFetch('/apples');
+
+  mock.willResolve({
+    count: 1,
+    apples: ['2kg'],
+  });
+  await callFetch('/apples');
+
+  expect(mock).toHaveFetchedNthTime(2, {
+    count: 1,
+    apples: ['2kg'],
+  });
 });
 ```
 

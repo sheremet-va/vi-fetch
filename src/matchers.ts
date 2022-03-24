@@ -80,11 +80,19 @@ const printApiCalls = (
   ].join('\n');
 };
 
-export function toFetch(this: JestUtils, actual: FetchSpyInstance) {
+export function toFetch(
+  this: JestUtils,
+  actual: FetchSpyInstance,
+  response?: unknown
+) {
   assertSpy(actual);
   const calls = actual.getRouteCalls();
   const route = actual.getRoute();
-  const pass = calls.length > 0;
+  let pass = calls.length > 0;
+  if (pass && response) {
+    const results = actual.getRouteResults();
+    pass = results.some((r) => this.equals(r, response));
+  }
   return {
     pass,
     message: () => {
@@ -93,6 +101,39 @@ export function toFetch(this: JestUtils, actual: FetchSpyInstance) {
           `${this.isNot ? '.not' : ''}.toFetch`,
           'api',
           ''
+        ),
+        '',
+        'Expected:',
+        `  Route "${this.utils.EXPECTED_COLOR(String(route))}" ${
+          this.isNot ? 'to never be called' : 'to be called at least once'
+        }.`,
+        'Received:',
+        printApiCalls(actual, this.utils.printReceived),
+      ].join('\n');
+    },
+  };
+}
+
+export function toFetchNthTime(
+  this: JestUtils,
+  actual: FetchSpyInstance,
+  time: number,
+  response: unknown
+) {
+  assertSpy(actual);
+  const route = actual.getRoute();
+  const results = actual.getRouteResults();
+  const pass = this.equals(results[time - 1], response);
+  return {
+    pass,
+    actual: results[time - 1],
+    expected: response,
+    message: () => {
+      return [
+        this.utils.matcherHint(
+          `${this.isNot ? '.not' : ''}.toFetchNthTime`,
+          'api',
+          'time, response'
         ),
         '',
         'Expected:',

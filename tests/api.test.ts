@@ -1,3 +1,4 @@
+import '../src/extend.js';
 import { prepareFetch, mockFetch, createMockFetch } from '../src/api.js';
 
 beforeAll(() => {
@@ -35,8 +36,7 @@ describe('mocked api returns', () => {
 
     const result = await fetch(baseUrl + '/path').then((r) => r.blob());
 
-    expect(result).toEqual(new Blob());
-    expect(result).not.toEqual(new Blob(['h']));
+    expect(result).toStrictEqual(new Blob());
   });
 
   test('mock arrayBuffer', async () => {
@@ -44,8 +44,8 @@ describe('mocked api returns', () => {
 
     const result = await fetch(baseUrl + '/path').then((r) => r.arrayBuffer());
 
-    expect(result).toEqual(new ArrayBuffer(1));
-    expect(result).not.toEqual(new ArrayBuffer(2));
+    expect(result).toStrictEqual(new ArrayBuffer(1));
+    expect(result).not.toStrictEqual(new ArrayBuffer(2));
   });
 });
 
@@ -207,8 +207,60 @@ describe('support functions', () => {
 
     await callApi('/apples');
 
-    expect(mock.getRouteResults()[0].headers.get('Content-Type')).toBe(
+    expect(mock.getRouteResponses()[0].headers.get('Content-Type')).toBe(
       'text/plain'
     );
+  });
+});
+
+describe('reassigning behaviour', () => {
+  const baseUrl = 'https://api.com/v1';
+
+  const { mockGet } = createMockFetch({
+    baseUrl,
+  });
+
+  const callApi = (url: string, ...args: [Parameters<typeof fetch>[1]?]) => {
+    return fetch(baseUrl + url, ...args).then((r) => r.json());
+  };
+
+  test('reassigning "will"', async () => {
+    const api = mockGet('/path').willResolve({
+      data: 1,
+    });
+
+    await callApi('/path');
+
+    expect(api).toFetchNthTime(1, { data: 1 });
+
+    api.willResolve({
+      data: 22,
+    });
+
+    await callApi('/path');
+
+    expect(api).toFetchNthTime(2, { data: 22 });
+
+    api.willThrow('Error');
+
+    expect(callApi('/path')).rejects.toThrow('Error');
+  });
+
+  test('reassigning "will" that has onces', async () => {
+    const api = mockGet('/path');
+
+    api.willResolveOnce({ data: 1 }).willResolve({ data: 22 });
+
+    await callApi('/path');
+    await callApi('/path');
+
+    expect(api).toFetchNthTime(1, { data: 1 });
+    expect(api).toFetchNthTime(2, { data: 22 });
+
+    api.willResolve({ data: 55 });
+
+    await callApi('/path');
+
+    expect(api).toFetchNthTime(3, { data: 55 });
   });
 });

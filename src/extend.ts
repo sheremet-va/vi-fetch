@@ -1,5 +1,6 @@
 import {
   toFetch,
+  toFetchNthTime,
   toFetchTimes,
   toFetchWithBody,
   toFetchWithQuery,
@@ -11,6 +12,9 @@ export function declareFetchAssertions(expect: { extend: (obj: any) => any }) {
   expect.extend({
     toHaveFetched: toFetch,
     toFetch,
+
+    toHaveFetchedNthTime: toFetchNthTime,
+    toFetchNthTime,
 
     toHaveFetchedTimes: toFetchTimes,
     toFetchTimes,

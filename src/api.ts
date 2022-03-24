@@ -39,12 +39,28 @@ interface CallsStorage {
   method: Method;
   path: string | RegExp;
   includesQuery: boolean;
-  once: boolean;
   result: MockResult;
+}
+
+function createStoragePredicate(fetchMethod: Method, urlPath: string) {
+  return ({ path, method, includesQuery }: CallsStorage) => {
+    if (fetchMethod !== method) return false;
+    const fetchPath =
+      !includesQuery && typeof path === 'string'
+        ? urlPath.split('?')[0]
+        : urlPath;
+    if (typeof path === 'string' && path === fetchPath) {
+      return true;
+    } else if (path instanceof RegExp && path.test(fetchPath)) {
+      return true;
+    }
+    return false;
+  };
 }
 
 class MockStorage {
   private storage: CallsStorage[] = [];
+  private onceStorage: CallsStorage[] = [];
 
   public will(
     method: Method,
@@ -54,49 +70,52 @@ class MockStorage {
     once: boolean,
     value: MockValue | Error | AwaitedMockValue
   ) {
-    this.storage.push({
+    // remove previous "will" (don't remove `Once`)
+    this.clear(method, path, false);
+    const item: CallsStorage = {
       method,
       path,
-      once,
       result: { type, value } as MockResult,
       includesQuery,
-    });
+    };
+    if (once) {
+      this.onceStorage.push(item);
+    } else {
+      this.storage.push(item);
+    }
   }
 
   getApiCall(fetchMethod: Method, urlPath: string) {
-    const storeIndex = this.storage.findIndex(
-      ({ path, method, includesQuery }) => {
-        if (fetchMethod !== method) return false;
-        const fetchPath =
-          !includesQuery && typeof path === 'string'
-            ? urlPath.split('?')[0]
-            : urlPath;
-        if (typeof path === 'string' && path === fetchPath) {
-          return true;
-        } else if (path instanceof RegExp && path.test(fetchPath)) {
-          return true;
-        }
-        return false;
-      }
-    );
-    if (storeIndex === -1) {
+    const predicate = createStoragePredicate(fetchMethod, urlPath);
+    const itemIndexOnce = this.onceStorage.findIndex(predicate);
+    if (itemIndexOnce > -1) {
+      const item = this.onceStorage[itemIndexOnce];
+      this.onceStorage.splice(itemIndexOnce, 1);
+      return item.result;
+    }
+    const itemIndex = this.storage.findIndex(predicate);
+    if (itemIndex === -1) {
       return undefined;
     }
-    const store = this.storage[storeIndex];
-    if (store.once) {
-      this.storage.splice(storeIndex, 1);
-    }
-    return store.result;
+    const item = this.storage[itemIndex];
+    return item.result;
   }
 
-  clear(fetchMethod: Method, fetchUrl: string | RegExp) {
-    this.storage = this.storage.filter(({ method, path }) => {
+  clear(fetchMethod: Method, fetchUrl: string | RegExp, removeOnce = true) {
+    const predicate = ({ method, path }: CallsStorage) => {
       return method !== fetchMethod && path !== fetchUrl;
-    });
+    };
+    this.storage = this.storage.filter(predicate);
+    if (removeOnce) {
+      this.onceStorage = this.onceStorage.filter(predicate);
+    }
+    return this;
   }
 
   clearAll() {
     this.storage = [];
+    this.onceStorage = [];
+    return this;
   }
 }
 

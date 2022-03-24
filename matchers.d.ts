@@ -1,14 +1,12 @@
 interface FetchAssertions<R> {
-  toHaveFetched(): R;
-  toFetch(): R;
+  toHaveFetched<T>(data?: T): R;
+  toFetch<T>(data?: T): R;
+
+  toHaveFetchedNthTime<T>(times: number, data: T): R;
+  toFetchNthTime<T>(times: number, data: T): R;
 
   toHaveFetchedTimes(times: number): R;
   toFetchTimes(times: number): R;
-
-  // toHaveFetchedWithHeaders(
-  //   headers: Record<string, string | number | undefined>
-  // ): R;
-  // toFetchWithHeaders(headers: Record<string, string | number | undefined>): R;
 
   toHaveFetchedWithBody(body: any): R;
   toFetchWithBody(body: any): R;
