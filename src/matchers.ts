@@ -89,7 +89,7 @@ export function toFetch(
   const calls = actual.getRouteCalls();
   const route = actual.getRoute();
   let pass = calls.length > 0;
-  if (pass && response) {
+  if (pass && typeof response !== 'undefined') {
     const results = actual.getRouteResults();
     pass = results.some((r) => this.equals(r, response));
   }
