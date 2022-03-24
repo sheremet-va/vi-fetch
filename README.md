@@ -235,10 +235,10 @@ mockFetch.setOptions({
 You can also create isolated `mockFetch` with its own options to not collide with globals. It also returns aliased methods.
 
 ```ts
-import { createMockFetch } from 'vi-fetch';
+import { createMockApi } from 'vi-fetch';
 import { test, expect } from 'vitest';
 
-const { mockFetch } = createMockFetch({ baseUrl: 'https://api.com/v2' });
+const { mockFetch } = createMockApi({ baseUrl: 'https://api.com/v2' });
 
 test('isolated', async () => {
   const mock = mockFetch('GET', '/apples').willResolve(33); // or mockGet
