@@ -26,7 +26,8 @@ export interface FetchSpyInstance {
   spy: SpyImpl<FetchArgs, Promise<Response>>;
   baseUrl: string;
   getRouteCalls(): FetchArgs[];
-  getRouteResults(): ResponseMock[];
+  getRouteResponses(): ResponseMock[];
+  getRouteResults<T = unknown>(): T[];
   getRoute(): string | RegExp;
   getMethod(): Method;
   /**
@@ -115,7 +116,7 @@ export class FetchMockInstance implements FetchSpyInstance {
     return this.options.spy.calls.filter((args) => this.isRoute(args));
   }
 
-  public getRouteResults() {
+  public getRouteResponses() {
     const returns: ResponseMock[] = [];
 
     this.spy.calls.forEach((call, index) => {
@@ -125,6 +126,10 @@ export class FetchMockInstance implements FetchSpyInstance {
     });
 
     return returns;
+  }
+
+  public getRouteResults<T = unknown>() {
+    return this.getRouteResponses().map((v) => v.value) as T[];
   }
 
   public withHeaders(headers: HeadersMockInit): FetchSpyInstance {
