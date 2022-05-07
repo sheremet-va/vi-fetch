@@ -3,7 +3,7 @@ import { HeadersMock } from './headers.js';
 import { FetchMockInstance, FetchSpyInstance } from './mock.js';
 import { ResponseMock } from './response.js';
 
-const methods = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'] as const;
+const methods = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'HEAD'] as const;
 
 export type Method = typeof methods[number];
 export type HeadersMockInit =
@@ -281,6 +281,7 @@ export const mockPost = createAlias('POST');
 export const mockPatch = createAlias('PATCH');
 export const mockDelete = createAlias('DELETE');
 export const mockPut = createAlias('PUT');
+export const mockHead = createAlias('HEAD');
 
 export function createMockFetch({
   baseUrl = '',
@@ -311,5 +312,6 @@ export function createMockFetch({
     mockPatch: createAlias('PATCH'),
     mockDelete: createAlias('DELETE'),
     mockPut: createAlias('PUT'),
+    mockHead: createAlias('HEAD'),
   };
 }
