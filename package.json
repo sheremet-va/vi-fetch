@@ -12,21 +12,22 @@
   ],
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
     },
     "./*": "./*",
     "./matchers": {
       "types": "./matchers.d.ts"
     },
     "./setup": {
-      "import": "./dist/setup.js",
-      "types": "./matchers.d.ts"
+      "types": "./matchers.d.ts",
+      "import": "./dist/setup.js"
     }
   },
   "scripts": {
     "test": "vitest --globals --environment jsdom",
     "build": "tsup",
+    "release": "bumpp package.json --commit --push --tag && npm run publish",
     "publish": "clean-publish --clean-docs"
   },
   "repository": {
@@ -41,15 +42,16 @@
   "homepage": "https://github.com/sheremet-va/vi-fetch#readme",
   "devDependencies": {
     "@types/node": "^17.0.21",
+    "bumpp": "^8.2.1",
     "clean-publish": "^4.0.0",
     "jsdom": "^19.0.0",
     "prettier": "^2.5.1",
     "tsup": "^5.12.1",
     "typescript": "^4.6.2",
-    "vitest": "^0.7.10"
+    "vitest": "^0.18.1"
   },
   "dependencies": {
     "query-string": "^7.1.1",
-    "tinyspy": "^0.3.0"
+    "tinyspy": "^1.0.0"
   }
 }
