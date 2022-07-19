@@ -263,4 +263,18 @@ describe('reassigning behaviour', () => {
 
     expect(api).toFetchNthTime(3, { data: 55 });
   });
+
+  test('multiple calls', async () => {
+    const api1 = mockGet('/apples');
+    const api2 = mockGet('/pears');
+
+    api1.willResolve({ data: 1 });
+    api2.willResolve({ data: 22 });
+
+    await callApi('/apples');
+    await callApi('/pears');
+
+    expect(api1).toHaveFetched({ data: 1 });
+    expect(api2).toHaveFetched({ data: 22 });
+  });
 });
