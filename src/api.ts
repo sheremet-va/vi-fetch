@@ -103,7 +103,7 @@ class MockStorage {
 
   clear(fetchMethod: Method, fetchUrl: string | RegExp, removeOnce = true) {
     const predicate = ({ method, path }: CallsStorage) => {
-      return method !== fetchMethod && path !== fetchUrl;
+      return method !== fetchMethod || path !== fetchUrl;
     };
     this.storage = this.storage.filter(predicate);
     if (removeOnce) {
