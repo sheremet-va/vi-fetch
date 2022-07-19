@@ -24,6 +24,7 @@
       "import": "./dist/setup.js"
     }
   },
+  "packageManager": "pnpm@7.3.0",
   "scripts": {
     "test": "vitest --globals --environment jsdom",
     "build": "tsup",
