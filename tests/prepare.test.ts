@@ -29,16 +29,15 @@ describe('prepare fetch mocks api', () => {
     expect(typeof obj.test).toBe('function');
   });
 
-  // TODO error thrown fails the test
-  // test('throws an error when not mocked', async () => {
-  //   expect(fetch).toBeUndefined();
+  test('throws an error when not mocked', async () => {
+    expect(fetch).toBeUndefined();
 
-  //   prepareFetch();
+    prepareFetch();
 
-  //   expect(fetch.bind(null, '/path')).to.throw(
-  //     'fetch is not defined. tried fetching /path'
-  //   );
+    expect(fetch('/path')).rejects.toThrowError(
+      'fetch is not defined. tried fetching "/path"'
+    );
 
-  //   globalThis.fetch = originalFetch;
-  // });
+    globalThis.fetch = originalFetch;
+  });
 });
