@@ -1,6 +1,6 @@
 {
   "name": "vi-fetch",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "Easiest way to mock fetch",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
