@@ -1,6 +1,6 @@
 {
   "name": "vi-fetch",
-  "version": "0.7.2",
+  "version": "0.8.0",
   "description": "Easiest way to mock fetch",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -28,7 +28,7 @@
   "scripts": {
     "test": "vitest --globals --environment jsdom",
     "build": "tsup",
-    "release": "bumpp package.json --commit --push --tag && npm run publish",
+    "release": "bumpp package.json --commit --push --tag && npm run build && npm run publish",
     "publish": "clean-publish --clean-docs"
   },
   "repository": {
