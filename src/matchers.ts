@@ -279,8 +279,13 @@ function createQueryComparison(
     typeof expectedQuery === 'string'
       ? parseQuery(expectedQuery)
       : expectedQuery;
-  return ([input]: [string | Request, ...any]) => {
-    const url = typeof input === 'string' ? input : input.url;
+  return ([input]: [string | Request | URL, ...any]) => {
+    const url =
+      typeof input === 'string'
+        ? input
+        : 'href' in input
+        ? input.href
+        : input.url;
     const uri = new URL(url);
     if (expectedQueryObj instanceof URLSearchParams) {
       return expectedQueryObj.toString() === uri.searchParams.toString();

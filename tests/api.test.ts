@@ -13,20 +13,24 @@ describe('mocked api returns', () => {
   const baseUrl = 'http://localhost/api';
   const { mockFetch } = createMockFetch({ baseUrl });
 
-  const callFetch = (cb: (r: Response) => any) => {
-    return fetch(baseUrl + '/path').then(cb);
+  const callFetch = (cb: (r: Response) => any, url = false) => {
+    return fetch(url ? new URL(baseUrl + '/path') : baseUrl + '/path').then(cb);
   };
 
   test('mock text', async () => {
     mockFetch('GET', '/path').willResolve('text');
 
     await expect(callFetch((r) => r.text())).resolves.toBe('text');
+    await expect(callFetch((r) => r.text(), true)).resolves.toBe('text');
   });
 
   test('mock json', async () => {
     mockFetch('GET', '/path').willResolve({ hello: 'world' });
 
     await expect(callFetch((r) => r.json())).resolves.toEqual({
+      hello: 'world',
+    });
+    await expect(callFetch((r) => r.json(), true)).resolves.toEqual({
       hello: 'world',
     });
   });

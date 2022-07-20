@@ -1,6 +1,7 @@
 import { spyOn } from 'tinyspy';
 import { HeadersMock } from './headers.js';
-import { FetchMockInstance, FetchSpyInstance } from './mock.js';
+import { FetchMockInstance } from './mock.js';
+import type { FetchArgs, FetchSpyInstance } from './mock.js';
 import { ResponseMock } from './response.js';
 
 const methods = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'HEAD'] as const;
@@ -168,13 +169,17 @@ export function prepareFetch(obj: any = globalThis, key: string = 'fetch') {
     });
   obj[key] = (async (urlOrRequest, optionsOrNothing) => {
     const url =
-      typeof urlOrRequest === 'string' ? urlOrRequest : urlOrRequest.url;
+      typeof urlOrRequest === 'string'
+        ? urlOrRequest
+        : 'href' in urlOrRequest
+        ? urlOrRequest.href
+        : urlOrRequest.url;
     const options =
       typeof optionsOrNothing !== 'undefined'
         ? optionsOrNothing
         : { method: 'GET' };
     const method =
-      typeof urlOrRequest !== 'string'
+      typeof urlOrRequest !== 'string' && !('href' in urlOrRequest)
         ? urlOrRequest.method
         : options.method || 'GET';
     let result = Mocks.getApiCall(method.toUpperCase() as Method, url);
@@ -196,8 +201,6 @@ export function prepareFetch(obj: any = globalThis, key: string = 'fetch') {
     });
   }) as typeof fetch;
 }
-
-type FetchArgs = [input: RequestInfo, init?: RequestInit | undefined];
 
 interface FetchSpyFn {
   (

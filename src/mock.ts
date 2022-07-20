@@ -20,7 +20,10 @@ interface MockInstanceOptions {
   headers: HeadersMock;
 }
 
-export type FetchArgs = [input: RequestInfo, init?: RequestInit | undefined];
+export type FetchArgs = [
+  input: RequestInfo | URL,
+  init?: RequestInit | undefined
+];
 
 export interface FetchSpyInstance {
   spy: SpyImpl<FetchArgs, Promise<Response>>;
@@ -229,7 +232,12 @@ export class FetchMockInstance implements FetchSpyInstance {
     const fetchPath = this.getRoute();
     const method = options?.method || 'GET';
     if (method !== this.options.method) return false;
-    let url = typeof input === 'string' ? input : input.url;
+    let url =
+      typeof input === 'string'
+        ? input
+        : 'href' in input
+        ? input.href
+        : input.url;
     if (!this.options.includeQuery) {
       [url] = url.split('?');
     }
