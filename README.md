@@ -1,5 +1,9 @@
 # vi-fetch
 
+::: [!warning]
+**This package is deprecated**. Use [MSW](https://mswjs.io/) instead as it promotes good mocking patterns.
+:::
+
 > Easiest way to mock fetch
 
 Compatible with [Vitest](https://github.com/vitest-dev/vitest) and [Jest](https://github.com/facebook/jest) when using [ESM flag](https://jestjs.io/docs/ecmascript-modules) or with transform for `/node_modules/vi-fetch`.
