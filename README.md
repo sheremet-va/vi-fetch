@@ -1,8 +1,7 @@
 # vi-fetch
 
-::: [!warning]
-**This package is deprecated**. Use [MSW](https://mswjs.io/) instead as it promotes good mocking patterns.
-:::
+> [!warning]
+> **This package is deprecated**. Use [MSW](https://mswjs.io/) instead as it promotes good mocking patterns.
 
 > Easiest way to mock fetch
 
